@@ -128,6 +128,14 @@ one folder per stack with `docker-compose.yml` + `.env.example`.
      fresh onion is generated and his wallet configs get the new address.
    - GATE 4: `get_info` answers over authenticated RPC; sync height climbing;
      ZMQ port live.
+   - **GUI wallet in this stack** (added 2026-11-09, Justin's request): the
+     official Monero GUI (v0.18.5.4) built into a Webtop browser desktop
+     (`wallet/Dockerfile` in the stack, SHA256-verified at build), served
+     on :3006 **tailnet-only** (it holds keys), basic-auth via stack `.env`.
+     It connects to this node only — Remote node `monerod:18081` with the
+     stack RPC login; wallet creation/seed is Justin's first-run step.
+     Wallet files under the stack's `data/wallet/` (gitignored, like all
+     `data/`).
 5. **Ollama** — official `ollama/ollama`, `--gpus=all`, models re-pulled:
    gpt-oss:120b, gpt-oss:20b, llama3.1:70b, qwen3.5:35b, qwen3.8.
    - GATE 5 (mirrors the Nov 6 proof): `ollama ps` shows the model **100% in

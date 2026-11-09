@@ -43,7 +43,7 @@ stacks/
   arcane/            # Docker management UI
   poznote/           # notes app + MCP server
   cloudflared/       # Cloudflare Tunnel connector
-  monerod/           # Monero node (+ tor sidecar)
+  monerod/           # Monero node (+ tor sidecar, GUI wallet)
   ollama/            # LLM runtime (GPU)
   twenty/            # Twenty CRM
   btcpay/            # BTCPay Server, Monero-only
@@ -259,6 +259,13 @@ curl -s -u monero:<password> http://127.0.0.1:18081/get_info
 
 **Gate 4:** `get_info` answers with the RPC login, block height is climbing.
 
+**GUI wallet (same stack):** the compose also builds the official Monero
+GUI wallet (v0.18.5.4, hash-verified) into a Webtop browser desktop at
+`ufo:3006` — **tailnet only**, basic-auth via `WALLET_GUI_*` in the stack
+`.env`. First run is manual (wallet creation + seed are Justin's hands):
+choose Advanced mode, then Settings → Node → Remote node `monerod:18081`
+with the stack's RPC login. Full steps in `stacks/monerod/README.md`.
+
 ## Stage 9 — Ollama (GPU)
 
 ```
@@ -330,6 +337,7 @@ Deploy from their stack folders (or Arcane) as wanted:
 | Poznote | `ufo:8040` | tailnet/LAN |
 | Poznote MCP | `ufo:8045` | tailnet/LAN, token-auth |
 | Ollama API | `ufo:11434` | tailnet/LAN |
+| Monero GUI wallet | `ufo:3006` | **tailnet only** — holds keys |
 | monerod RPC | `ufo:18081` (login required) | LAN/tailnet |
 | monerod restricted RPC | `ufo:18089` | LAN/tailnet |
 | monerod ZMQ | `ufo:18083` | local networks (P2Pool) |

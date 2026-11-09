@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Monero GUI Wallet
+Comment=Official Monero GUI wallet — point it at the local node (monerod:18081)
+Exec=/opt/monero-gui/start-gui.sh
+Terminal=false
+Categories=Finance;Network;
+X-GNOME-Autostart-enabled=true

@@ -1,5 +1,6 @@
-# monerod — the one shared Monero node for BTCPay, P2Pool and wallets.
-# Same image the Umbrel app used. PRUNED by default (see .env to change).
+# monerod — the one shared Monero node for BTCPay, P2Pool and wallets,
+# plus the official GUI wallet (browser desktop) riding in the same stack.
+# Same node image the Umbrel app used. PRUNED by default (see .env).
 # RPC login is deliberately ON here (on umbrelOS it never actually was).
 services:
   monerod:
@@ -43,6 +44,45 @@ services:
       - homepage.name=Monero Node
       - homepage.icon=monero
       - homepage.description=monerod (RPC on 18081)
+
+  # Monero GUI wallet — official release in a Webtop browser desktop
+  # (built from ./wallet, see its Dockerfile). TAILSCALE-ONLY, same class
+  # as Twenty: it holds wallet keys. Never publish it beyond the LAN/
+  # tailnet, never route it through the Cloudflare tunnel.
+  # It talks to THIS stack's node: in the GUI, Settings → Node → Remote
+  # node = monerod:18081 with the RPC login from .env (first-run steps in
+  # this stack's README.md). The web UI itself is basic-auth protected
+  # (WALLET_GUI_* in .env) — set a real password, it guards keys.
+  wallet-gui:
+    build:
+      context: ./wallet
+    image: ufo/monero-gui-wallet:0.18.5.4
+    container_name: monero-gui-wallet
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/New_York
+      CUSTOM_USER: ${WALLET_GUI_USER:-justin}
+      PASSWORD: ${WALLET_GUI_PASSWORD:-}
+      TITLE: Monero Wallet
+    ports:
+      - "3006:3000"
+    volumes:
+      # Webtop home dir: wallet files land in ./data/wallet/Monero/wallets.
+      # data/ is gitignored — keys never enter the repo.
+      - ./data/wallet:/config
+    shm_size: "2gb"
+    security_opt:
+      - seccomp:unconfined
+    depends_on:
+      - monerod
+    labels:
+      - homepage.group=Payments
+      - homepage.name=Monero GUI Wallet
+      - homepage.icon=monero
+      - homepage.href=http://ufo:3006
+      - homepage.description=Official GUI wallet (tailnet only)
 
   # Tor sidecar — carries the RPC hidden service. If the pre-wipe key folders
   # were saved (see README Stage 0), drop them into ./tor-data/ before first

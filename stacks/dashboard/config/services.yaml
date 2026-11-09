@@ -62,6 +62,12 @@
         container: goose-web
 
 - Payments:
+    - Monero GUI Wallet:
+        icon: monero
+        href: http://ufo:3006
+        description: Official GUI wallet (tailnet only)
+        server: ufo
+        container: monero-gui-wallet
     - BTCPay (Monero):
         icon: btcpay-server
         href: https://pay.voodoobazaar.com

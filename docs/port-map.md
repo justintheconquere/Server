@@ -12,6 +12,7 @@ internet by design.
 | 3003 | Bitcart (store/admin) | bitcart | tailnet/LAN |
 | 3004 | Chrome (browser UI) | chrome | tailnet/LAN |
 | 3005 | Homepage dashboard | dashboard | tailnet/LAN |
+| 3006 | Monero GUI wallet (Webtop desktop) | monerod | **tailnet only** — holds keys |
 | 3552 | Arcane | arcane | tailnet/LAN |
 | 5223 | SimpleX SMP | simplex | public (by design) |
 | 443 | SimpleX XFTP | simplex | public (by design) |
