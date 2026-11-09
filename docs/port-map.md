@@ -53,6 +53,11 @@ internet by design.
 | 18089 | monerod restricted RPC | monerod | LAN/tailnet |
 | 23000 | BTCPay Server | btcpay | tailnet/LAN (public face = pay.voodoobazaar.com via tunnel) |
 | 9090 | Cockpit (host package, not Docker) | — | tailnet/LAN |
+| 3017 | Dify (nginx front door) | dify | tailnet/LAN |
+| 3100 | Paperclip | paperclip | tailnet/LAN |
+| 8080 | qBittorrent WebUI | torrents (published by gluetun) | tailnet/LAN |
+| 6881 | BitTorrent peers (TCP + UDP) | torrents (published by gluetun) | egress via VPN |
+| 9696 | Prowlarr | torrents | tailnet/LAN |
 | — | Toolbox (scripts + cron) | toolbox | no published ports |
 
 Web UI on 8040; the MCP

@@ -197,7 +197,8 @@ hostnames become plain compose service names:
   nodes and built-in approval steps gating anything customer-facing;
   **Hermes** (Nous Research; dashboard :9119, gateway API :8642,
   tailnet-only, no Docker socket by default) holds memory and judgment
-  and feeds n8n. **Paperclip** (agent-org orchestration) is deferred —
+  and feeds n8n. **Paperclip** (agent-org orchestration): stack built
+  2026-11-09, deployment still deferred to the governance phase —
   it has no model settings of its own (the Ollama URL lives in the
   enrolled runtime, which is why Justin found no URL field for it on
   Umbrel; native Ollama support is an open upstream feature request).
@@ -217,6 +218,15 @@ hostnames become plain compose service names:
   run one, same port), **Paperless-ngx**, **Vaultwarden**, **SearXNG**,
   **Stirling-PDF**, **changedetection.io**, **Cup**, **Jellyfin**,
   **Immich**, **RomM**.
+- **Final suggestions batch** (added 2026-11-09 — Justin: "do the rest
+  of your suggestions," plus a torrent ask): **Dify** (LLM app
+  platform, pilot only — the future customer-facing slot; a heavy
+  10-service stack mirroring upstream's 1.19.0 compose, VERIFY at
+  deploy, nothing public without his review) and **Torrents**:
+  qBittorrent running inside Gluetun's network namespace (a VPN kill
+  switch by construction — no VPN, no traffic; its WebUI/peer ports
+  are published in the gluetun stack, so Gluetun deploys first) +
+  Prowlarr for indexer search.
 - **Per-service Tor onions** (Justin's request, 2026-11-09): a stack
   that needs an onion gets a Tor sidecar (same getumbrel/tor image as
   monerod) with a stack-local torrc; keys live under the stack's

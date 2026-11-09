@@ -106,6 +106,18 @@
         description: Image generation on the 5090
         server: ufo
         container: comfyui
+    - Paperclip:
+        icon: paperclip.svg
+        href: http://ufo:3100
+        description: Agent org chart, budgets, approvals
+        server: ufo
+        container: paperclip
+    - Dify:
+        icon: dify.svg
+        href: http://ufo:3017
+        description: LLM app platform (pilot)
+        server: ufo
+        container: dify-nginx
     - Goose:
         icon: goose.svg
         href: http://ufo:8012
@@ -220,6 +232,18 @@
         description: Web page change alerts
         server: ufo
         container: changedetection
+    - qBittorrent:
+        icon: qbittorrent
+        href: http://ufo:8080
+        description: Torrent downloader (via VPN)
+        server: ufo
+        container: qbittorrent
+    - Prowlarr:
+        icon: prowlarr
+        href: http://ufo:9696
+        description: Torrent indexer search
+        server: ufo
+        container: prowlarr
 
 - Media:
     - Jellyfin:

@@ -1,0 +1,63 @@
+# Torrents — qBittorrent (the downloader) + Prowlarr (indexer search
+# across torrent sites, one box to search them all).
+#
+# qBittorrent runs INSIDE the Gluetun container's network namespace:
+# every byte egresses through the VPN, and if the VPN is down it has
+# no route out at all — a kill switch by construction, not a setting.
+# Consequences:
+# - Deploy the Gluetun stack FIRST, with its WireGuard config filled
+#   in, or qBittorrent cannot start (it attaches to that container).
+# - Its ports are published in the GLUETUN stack's compose (WebUI
+#   8080, peer traffic 6881 tcp/udp), not here.
+#
+# Prowlarr runs on normal networking — it only queries indexers over
+# HTTPS and hands picks to qBittorrent. Wire them together in
+# Prowlarr: Settings -> Download Clients -> qBittorrent, host "ufo",
+# port 8080, plus the username/password you set in qBittorrent.
+#
+# First qBittorrent login: the temporary admin password is printed in
+# the container log on first start (`docker logs qbittorrent`). Log
+# in and change it immediately.
+#
+# Downloads land in ./data/downloads. Point Jellyfin's or RomM's
+# library folders at it later if you want them to see finished files.
+# And the obvious: only pull content you have the right to pull.
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:5.3.0
+    container_name: qbittorrent
+    restart: unless-stopped
+    network_mode: "container:gluetun"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/New_York
+      WEBUI_PORT: "8080"
+    volumes:
+      - ./data/qbit/config:/config
+      - ./data/downloads:/downloads
+    labels:
+      - homepage.group=Tools
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent
+      - homepage.href=http://ufo:8080
+      - homepage.description=Torrent downloader (via VPN)
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:version-2.7.0.5723
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/New_York
+    ports:
+      - "9696:9696"
+    volumes:
+      - ./data/prowlarr/config:/config
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Prowlarr
+      - homepage.icon=prowlarr
+      - homepage.href=http://ufo:9696
+      - homepage.description=Torrent indexer search

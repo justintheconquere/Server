@@ -1,0 +1,50 @@
+# Paperclip — the agent-org layer: org charts, roles, budgets, and
+# approval gates for a team of agents. It is NOT an agent and does NO
+# inference — it hires agent runtimes. There are deliberately no model
+# settings here: the Ollama URL lives inside the enrolled runtime
+# (Hermes), never in Paperclip. (That's why its Umbrel install showed
+# no URL field — native Ollama support is an upstream feature request.)
+#
+# How it connects here: Paperclip's "Hermes Gateway" adapter points at
+# the Hermes stack — API base URL http://hermes:8642 (same ufo-net) +
+# the API_SERVER_KEY from the hermes stack's .env. Note: Paperclip
+# refuses plain HTTP to a non-loopback gateway unless you enable its
+# "Dangerously allow remote HTTP" toggle in the adapter config — on
+# the private ufo-net that's the expected setting.
+#
+# Deploy timing: this earns its place once several persistent agents
+# need budgets and governance (the Phase-2 layer). The stack is built
+# and ready; nothing depends on it yet.
+#
+# Image: upstream publishes rolling tags only (latest + commit SHAs),
+# so this pins the digest of :latest as verified 2026-11-09 — bump
+# deliberately, same as any other pin.
+# Telemetry: disabled (PAPERCLIP_TELEMETRY_DISABLED=1).
+# VERIFY at deploy: Paperclip's embedded-Postgres data path inside
+# the container — ./data is mounted at /data; after first run,
+# `docker exec paperclip ls /data` should show its data. If it's
+# empty, check upstream's compose for the real path and move the mount.
+services:
+  paperclip:
+    image: ghcr.io/paperclipai/paperclip@sha256:d6584f05cf57a4b26c117eb083725f18c1fe69ddafa7d16c9f8cce83f6fa17da
+    container_name: paperclip
+    restart: unless-stopped
+    environment:
+      PAPERCLIP_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./data:/data
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=AI
+      - homepage.name=Paperclip
+      - homepage.icon=paperclip.svg
+      - homepage.href=http://ufo:3100
+      - homepage.description=Agent org chart, budgets, approvals
+
+networks:
+  ufo-net:
+    external: true
