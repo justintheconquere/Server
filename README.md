@@ -206,6 +206,10 @@ docker compose up -d
   (its projects directory points at `~/server-config/stacks`). Deploy the
   remaining stacks from Arcane, or with `docker compose up -d` in each
   folder — both operate on the same projects.
+- **One at a time.** Deploying everything at once caused real pain on
+  umbrelOS; bring stacks up singly and check each before the next.
+  `docs/app-store.html` in this repo is a click-to-copy catalog of every
+  stack (compose YAML + .env templates) in a sane deploy order.
 
 ## Stage 6 — Poznote
 
