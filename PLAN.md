@@ -208,6 +208,15 @@ hostnames become plain compose service names:
   private script/config repos) and **Toolbox** (a raw scripts + cron
   container for machine-level jobs; Docker socket mounted deliberately,
   no published ports).
+- **Extras batch** (added 2026-11-09 — Justin picked the whole ideas
+  list; all built as stacks in the app store, deploy à la carte, one
+  at a time): **Uptime Kuma** (monitoring), **Open WebUI** (chat UI
+  for the local models), **ComfyUI** (image generation, Docker — needs
+  the container toolkit, see README Stage 2), the **Ollama Docker
+  variant** (restored as a stack so native-vs-Docker stays a choice —
+  run one, same port), **Paperless-ngx**, **Vaultwarden**, **SearXNG**,
+  **Stirling-PDF**, **changedetection.io**, **Cup**, **Jellyfin**,
+  **Immich**, **RomM**.
 - **Per-service Tor onions** (Justin's request, 2026-11-09): a stack
   that needs an onion gets a Tor sidecar (same getumbrel/tor image as
   monerod) with a stack-local torrc; keys live under the stack's

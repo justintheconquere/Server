@@ -1,0 +1,27 @@
+# Vaultwarden — self-hosted Bitwarden-compatible password vault.
+# Use the official Bitwarden apps/browser extensions pointed at
+# http://ufo:3010.
+#
+# FIRST RUN ORDER MATTERS: signups are open below so the first (admin)
+# account can be created. Create your account, vault your items, THEN
+# set SIGNUPS_ALLOWED to "false" and restart the stack. The open
+# window is tailnet-only, but don't leave it open.
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.37.5
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: http://ufo:3010
+      SIGNUPS_ALLOWED: "true"
+      ADMIN_TOKEN: ${ADMIN_TOKEN:-}
+    ports:
+      - "3010:80"
+    volumes:
+      - ./data:/data
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Vaultwarden
+      - homepage.icon=vaultwarden
+      - homepage.href=http://ufo:3010
+      - homepage.description=Password vault (Bitwarden-compatible)

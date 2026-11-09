@@ -1,0 +1,25 @@
+# Cup — watches the Docker images on this box and reports which have
+# updates available, without pulling or applying anything. Fits the
+# pin-everything-on-purpose approach: you see what's new, then bump
+# deliberately.
+# It reads the Docker socket to inventory local images. (Read access
+# in practice — Cup never manages containers — but a socket mount is
+# a socket mount; tailnet-only UI, like everything else here.)
+# VERIFY at deploy: `cup serve` flags (docker exec cup cup serve
+# --help) if the port/host defaults differ in v3.6.
+services:
+  cup:
+    image: ghcr.io/sergi0g/cup:v3.6.0
+    container_name: cup
+    restart: unless-stopped
+    command: ["serve"]
+    ports:
+      - "3015:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - homepage.group=Management
+      - homepage.name=Cup
+      - homepage.icon=cup
+      - homepage.href=http://ufo:3015
+      - homepage.description=Docker image update watcher

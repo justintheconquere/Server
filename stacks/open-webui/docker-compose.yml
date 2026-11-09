@@ -1,0 +1,31 @@
+# Open WebUI — chat front-end for the local models.
+# Talks to Ollama on the host (the native install) via
+# host.docker.internal. If the Docker Ollama stack is ever used
+# instead, join both to ufo-net and point OLLAMA_BASE_URL at
+# http://ollama:11434.
+#
+# Tag note: upstream ships :main as its standard install tag (their
+# docs' own install line) — this is the repo's documented exception to
+# the pin-everything rule. Bump by pulling :main deliberately.
+#
+# First run: the first account to sign up becomes admin — create it,
+# then turn off new signups in Admin → Settings.
+services:
+  webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    restart: unless-stopped
+    environment:
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "3008:8080"
+    volumes:
+      - ./data:/app/backend/data
+    labels:
+      - homepage.group=AI
+      - homepage.name=Open WebUI
+      - homepage.icon=open-webui
+      - homepage.href=http://ufo:3008
+      - homepage.description=Chat UI for local models

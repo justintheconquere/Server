@@ -1,0 +1,22 @@
+# Uptime Kuma — uptime monitoring for everything on the box (and the
+# public sites). The monitors are only half of it: set up a
+# notification channel (email / ntfy / Telegram) in the UI, or alerts
+# go nowhere.
+# First run: create the admin account at http://ufo:3009.
+# Suggested monitors: every stack's port, assurebay.com,
+# pay.voodoobazaar.com, and monerod's restricted RPC :18089/get_info.
+services:
+  kuma:
+    image: louislam/uptime-kuma:2.5.9
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3009:3001"
+    volumes:
+      - ./data:/app/data
+    labels:
+      - homepage.group=Management
+      - homepage.name=Uptime Kuma
+      - homepage.icon=uptime-kuma
+      - homepage.href=http://ufo:3009
+      - homepage.description=Uptime monitoring + alerts

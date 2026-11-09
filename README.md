@@ -130,10 +130,10 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo usermod -aG docker $USER
 ```
 
-The NVIDIA container toolkit is deliberately **not** installed: no stack
-runs GPU workloads in a container (Ollama is a native host install,
-Stage 9), so the toolkit would be one more moving part for nothing. If a
-GPU container is ever added, install it then
+The NVIDIA container toolkit is deliberately **not** installed up
+front: the default AI path is native (Ollama, Stage 9). Two optional
+stacks ARE GPU containers — the Ollama Docker variant and ComfyUI.
+If you deploy either, install the toolkit first
 (<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>)
 and use a `--gpus all` test container as that stack's gate.
 
@@ -358,13 +358,18 @@ Deploy from their stack folders (or Arcane) as wanted:
   `.env`), gateway API `ufo:8642` (key in `.env`) — tailnet only, no
   Docker socket. See `stacks/hermes/README.md`.
 - **Bitcart, Chrome, Gluetun, SimpleX, Conduit, strfry, Goose, Haveno,
-  Haveno seednode, Arch + Phosh, ttyd (web terminal), Gitea, Toolbox** —
-  per their stack folders. SimpleX and strfry identity keys are part of
-  the Backrest scope from first start. ttyd is a password-gated root
-  shell in a browser tab (`ufo:7681`) — tailnet only, see
-  `stacks/ttyd/README.md`. Gitea is the box's own git home (`ufo:3007`);
-  Toolbox is the raw scripts + cron runner (no ports, Docker socket
-  mounted on purpose — see `stacks/toolbox/README.md`).
+  Haveno seednode, Arch + Phosh, ttyd (web terminal), Gitea, Toolbox,
+  Uptime Kuma, Open WebUI, ComfyUI, the Ollama Docker variant,
+  Paperless, Vaultwarden, SearXNG, Stirling-PDF, ChangeDetection, Cup,
+  Jellyfin, Immich, RomM** — per their stack folders. SimpleX and strfry
+  identity keys are part of the Backrest scope from first start. ttyd is
+  a password-gated root shell in a browser tab (`ufo:7681`) — tailnet
+  only, see `stacks/ttyd/README.md`. Gitea is the box's own git home
+  (`ufo:3007`); Toolbox is the raw scripts + cron runner (no ports,
+  Docker socket mounted on purpose — see `stacks/toolbox/README.md`).
+  The GPU stacks (ComfyUI, Ollama Docker variant) need the Stage 2
+  toolkit install first; the Ollama variant and the native install are
+  alternatives — run one, never both (same port).
 
 ---
 

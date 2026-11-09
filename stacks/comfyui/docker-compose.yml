@@ -1,0 +1,39 @@
+# ComfyUI (Docker) — local image generation on the RTX 5090.
+# ComfyUI is its own backend: engine + UI are one process on :8188.
+# It does NOT use Ollama or its models — image checkpoints live in
+# ./data/models (SDXL ≈7 GB, Flux ≈12–24 GB, downloaded separately).
+#
+# HOST PREREQUISITE: the NVIDIA container toolkit (README Stage 2 kept
+# the steps). Gate before deploying: a `--gpus all` test container's
+# nvidia-smi must show the 5090.
+#
+# Image: yanwk/comfyui-boot, CUDA 13.0 build (Blackwell-ready), pinned
+# to the dated tag verified 2026-11-09.
+# VERIFY at deploy: the volume paths follow this image's documented
+# layout (/root/ComfyUI/...). Models MUST land on the host volumes
+# below or they vanish when the container is rebuilt.
+services:
+  comfyui:
+    image: yanwk/comfyui-boot:cu130-slim-20261109
+    container_name: comfyui
+    restart: unless-stopped
+    ports:
+      - "8188:8188"
+    volumes:
+      - ./data/models:/root/ComfyUI/models
+      - ./data/output:/root/ComfyUI/output
+      - ./data/user:/root/ComfyUI/user
+      - ./data/custom_nodes:/root/ComfyUI/custom_nodes
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    labels:
+      - homepage.group=AI
+      - homepage.name=ComfyUI
+      - homepage.icon=comfyui
+      - homepage.href=http://ufo:8188
+      - homepage.description=Image generation on the 5090

@@ -1,0 +1,57 @@
+# Paperless-ngx — document archive with OCR and full-text search.
+# Drop files in ./data/consume (or use the web upload / mobile app)
+# and they get OCR'd, tagged, and made searchable. Made for the
+# insurance desk: licensing docs, carrier paperwork, records.
+# First run: the admin account comes from PAPERLESS_ADMIN_* in .env
+# (created automatically on first start).
+services:
+  webserver:
+    image: paperlessngx/paperless-ngx:2.20.15
+    container_name: paperless
+    restart: unless-stopped
+    depends_on:
+      - db
+      - broker
+    ports:
+      - "3012:8000"
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBNAME: paperless
+      PAPERLESS_DBUSER: paperless
+      PAPERLESS_DBPASS: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      PAPERLESS_SECRET_KEY: ${PAPERLESS_SECRET_KEY:?set PAPERLESS_SECRET_KEY in .env}
+      PAPERLESS_ADMIN_USER: ${PAPERLESS_ADMIN_USER:-justin}
+      PAPERLESS_ADMIN_PASSWORD: ${PAPERLESS_ADMIN_PASSWORD:?set PAPERLESS_ADMIN_PASSWORD in .env}
+      PAPERLESS_URL: http://ufo:3012
+      PAPERLESS_TIME_ZONE: America/New_York
+      PAPERLESS_OCR_LANGUAGE: eng
+    volumes:
+      - ./data/data:/usr/src/paperless/data
+      - ./data/media:/usr/src/paperless/media
+      - ./data/export:/usr/src/paperless/export
+      - ./data/consume:/usr/src/paperless/consume
+    labels:
+      - homepage.group=Business
+      - homepage.name=Paperless
+      - homepage.icon=paperless-ngx
+      - homepage.href=http://ufo:3012
+      - homepage.description=Document archive (OCR + search)
+
+  db:
+    image: postgres:16-alpine
+    container_name: paperless-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: paperless
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  broker:
+    image: redis:7.4-alpine
+    container_name: paperless-broker
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data

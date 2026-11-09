@@ -1,0 +1,24 @@
+# SearXNG — private metasearch: your own search page, and a search
+# backend the agents can call (Hermes/Goose) instead of a third-party
+# API. Upstream releases are date-tagged; the pin is the build
+# verified 2026-11-09.
+# First start writes a default settings.yml into ./data — set a
+# random secret_key in it, and make sure `json` is among
+# search.formats or agent API calls get a 403.
+services:
+  searxng:
+    image: searxng/searxng:2026.11.9-57ff753ad
+    container_name: searxng
+    restart: unless-stopped
+    environment:
+      SEARXNG_BASE_URL: http://ufo:3011/
+    ports:
+      - "3011:8080"
+    volumes:
+      - ./data:/etc/searxng
+    labels:
+      - homepage.group=Tools
+      - homepage.name=SearXNG
+      - homepage.icon=searxng
+      - homepage.href=http://ufo:3011
+      - homepage.description=Private metasearch (agent backend too)

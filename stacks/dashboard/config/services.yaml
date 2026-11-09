@@ -30,6 +30,18 @@
         description: Backups (restic → USB)
         server: ufo
         container: backrest
+    - Uptime Kuma:
+        icon: uptime-kuma
+        href: http://ufo:3009
+        description: Uptime monitoring + alerts
+        server: ufo
+        container: uptime-kuma
+    - Cup:
+        icon: cup
+        href: http://ufo:3015
+        description: Docker image update watcher
+        server: ufo
+        container: cup
     - Cockpit:
         icon: cockpit
         href: http://ufo:9090
@@ -58,6 +70,12 @@
         description: Workflow automation — ops engine
         server: ufo
         container: n8n
+    - Paperless:
+        icon: paperless-ngx
+        href: http://ufo:3012
+        description: Document archive (OCR + search)
+        server: ufo
+        container: paperless
     - Client Portal (pilot):
         icon: twenty.svg
         href: http://ufo:3002
@@ -76,6 +94,18 @@
         description: Chief-of-staff agent (dashboard)
         server: ufo
         container: hermes
+    - Open WebUI:
+        icon: open-webui
+        href: http://ufo:3008
+        description: Chat UI for local models
+        server: ufo
+        container: open-webui
+    - ComfyUI:
+        icon: comfyui
+        href: http://ufo:8188
+        description: Image generation on the 5090
+        server: ufo
+        container: comfyui
     - Goose:
         icon: goose.svg
         href: http://ufo:8012
@@ -166,3 +196,47 @@
         description: Phone desktop in the browser
         server: ufo
         container: arch-phosh-web
+    - Vaultwarden:
+        icon: vaultwarden
+        href: http://ufo:3010
+        description: Password vault (Bitwarden-compatible)
+        server: ufo
+        container: vaultwarden
+    - SearXNG:
+        icon: searxng
+        href: http://ufo:3011
+        description: Private metasearch (agent backend too)
+        server: ufo
+        container: searxng
+    - Stirling-PDF:
+        icon: stirling-pdf
+        href: http://ufo:3013
+        description: PDF toolkit — merge, split, sign, OCR
+        server: ufo
+        container: stirling-pdf
+    - ChangeDetection:
+        icon: changedetection
+        href: http://ufo:3014
+        description: Web page change alerts
+        server: ufo
+        container: changedetection
+
+- Media:
+    - Jellyfin:
+        icon: jellyfin
+        href: http://ufo:8096
+        description: Media server
+        server: ufo
+        container: jellyfin
+    - Immich:
+        icon: immich
+        href: http://ufo:2283
+        description: Photo backup + library
+        server: ufo
+        container: immich-server
+    - RomM:
+        icon: romm
+        href: http://ufo:3016
+        description: Retro game library
+        server: ufo
+        container: romm

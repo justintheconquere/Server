@@ -1,0 +1,59 @@
+# Immich — self-hosted photo/video backup (the Google Photos
+# replacement): phone app auto-backup, timeline, search, face/object
+# recognition via the ML service. Server + ML are pinned to the same
+# release (v3.3.6, verified on GHCR 2026-11-09) — they must always
+# match.
+#
+# VERIFY at deploy: Immich is the most version-sensitive stack in
+# this repo. The shape below follows the official v3 compose (server
+# on :2283, library at /data, vectorchord Postgres). If anything
+# misbehaves at first run, diff against the official docker-compose
+# for v3.3.6 before improvising.
+# First run: the first account created at http://ufo:2283 is admin.
+services:
+  server:
+    image: ghcr.io/immich-app/immich-server:v3.3.6
+    container_name: immich-server
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      DB_HOSTNAME: db
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: redis
+    ports:
+      - "2283:2283"
+    volumes:
+      - ./data/library:/data
+    labels:
+      - homepage.group=Media
+      - homepage.name=Immich
+      - homepage.icon=immich
+      - homepage.href=http://ufo:2283
+      - homepage.description=Photo backup + library
+
+  ml:
+    image: ghcr.io/immich-app/immich-machine-learning:v3.3.6
+    container_name: immich-ml
+    restart: unless-stopped
+    volumes:
+      - ./data/model-cache:/cache
+
+  db:
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvector0.8.0-pgvectors0.3.0
+    container_name: immich-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_DB: immich
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: immich-redis
+    restart: unless-stopped

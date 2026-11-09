@@ -1,0 +1,30 @@
+# Ollama — the DOCKER variant. The default plan is the NATIVE host
+# install (README Stage 9); this stack exists so the choice is one
+# click either way. Run only ONE of them — both bind host port 11434.
+#
+# GPU containers need the NVIDIA container toolkit on the host first
+# (README Stage 2 kept the install steps + the --gpus test gate).
+# Without it, this container silently runs on CPU and Gate 5 fails —
+# that's the toolkit missing, not an Ollama bug.
+services:
+  ollama:
+    image: ollama/ollama:0.40.15
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    labels:
+      - homepage.group=AI
+      - homepage.name=Ollama
+      - homepage.icon=ollama
+      - homepage.href=http://ufo:11434
+      - homepage.description=LLM runtime — Docker variant (API)

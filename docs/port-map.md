@@ -31,7 +31,19 @@ internet by design.
 | 8045 | Poznote MCP server | poznote | tailnet/LAN, token-auth |
 | 8888 | Gluetun HTTP proxy | gluetun | tailnet/LAN |
 | 9898 | Backrest | backrest | tailnet/LAN |
-| 11434 | Ollama API | — (native host install, no container) | tailnet/LAN |
+| 11434 | Ollama API | native host install OR ollama stack — run one | tailnet/LAN |
+| 2283 | Immich | immich | tailnet/LAN |
+| 3008 | Open WebUI | open-webui | tailnet/LAN |
+| 3009 | Uptime Kuma | uptime-kuma | tailnet/LAN |
+| 3010 | Vaultwarden | vaultwarden | tailnet/LAN |
+| 3011 | SearXNG | searxng | tailnet/LAN |
+| 3012 | Paperless-ngx | paperless | tailnet/LAN |
+| 3013 | Stirling-PDF | stirling-pdf | tailnet/LAN |
+| 3014 | changedetection.io | changedetection | tailnet/LAN |
+| 3015 | Cup | cup | tailnet/LAN |
+| 3016 | RomM | romm | tailnet/LAN |
+| 8096 | Jellyfin | jellyfin | tailnet/LAN |
+| 8188 | ComfyUI | comfyui | tailnet/LAN |
 | 5678 | n8n (workflow automation) | n8n | tailnet/LAN |
 | 8642 | Hermes gateway API (key required) | hermes | tailnet/LAN |
 | 9119 | Hermes dashboard (basic auth) | hermes | tailnet/LAN |

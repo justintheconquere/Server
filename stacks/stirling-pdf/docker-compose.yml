@@ -1,0 +1,19 @@
+# Stirling-PDF — every PDF operation in one browser page: merge,
+# split, sign, compress, convert, OCR. Insurance runs on PDFs.
+# Stateless by design; configs/logs persist below.
+services:
+  stirling:
+    image: stirlingtools/stirling-pdf:3.3.0
+    container_name: stirling-pdf
+    restart: unless-stopped
+    ports:
+      - "3013:8080"
+    volumes:
+      - ./data/configs:/configs
+      - ./data/logs:/logs
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Stirling-PDF
+      - homepage.icon=stirling-pdf
+      - homepage.href=http://ufo:3013
+      - homepage.description=PDF toolkit — merge, split, sign, OCR

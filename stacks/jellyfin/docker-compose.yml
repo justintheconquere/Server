@@ -1,0 +1,21 @@
+# Jellyfin — media server (movies, shows, music) streaming to the
+# phone/TV apps. Drop media into ./data/media (library folders are
+# set in the first-run wizard), or repoint that volume at a bigger
+# disk later. First run: the wizard creates the admin account.
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:12.4.20261026-211555
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./data/config:/config
+      - ./data/cache:/cache
+      - ./data/media:/media
+    labels:
+      - homepage.group=Media
+      - homepage.name=Jellyfin
+      - homepage.icon=jellyfin
+      - homepage.href=http://ufo:8096
+      - homepage.description=Media server

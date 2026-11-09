@@ -1,0 +1,45 @@
+# RomM — retro game library front-end: scans a ROM folder, fetches
+# artwork/metadata, and serves a clean library (with in-browser
+# emulation for many systems). Drop ROMs under ./data/library
+# (organized by platform — see RomM's docs for the folder layout).
+# First run: create the admin account in the setup wizard.
+# VERIFY at deploy: RomM 4.x env names (DB_*, ROMM_AUTH_SECRET_KEY)
+# against the release notes if the DB connection fails at first run.
+services:
+  romm:
+    image: rommapp/romm:4.9.2
+    container_name: romm
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: romm
+      DB_USER: romm
+      DB_PASSWD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      ROMM_AUTH_SECRET_KEY: ${AUTH_SECRET:?set AUTH_SECRET in .env}
+    ports:
+      - "3016:8080"
+    volumes:
+      - ./data/library:/romm/library
+      - ./data/resources:/romm/resources
+      - ./data/assets:/romm/assets
+      - ./data/config:/romm/config
+    labels:
+      - homepage.group=Media
+      - homepage.name=RomM
+      - homepage.icon=romm
+      - homepage.href=http://ufo:3016
+      - homepage.description=Retro game library
+
+  db:
+    image: mariadb:11.4
+    container_name: romm-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: romm
+      MARIADB_USER: romm
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+    volumes:
+      - ./data/db:/var/lib/mysql

@@ -1,0 +1,34 @@
+# changedetection.io — watches web pages and alerts when they change.
+# Point it at Florida DFS/OIR bulletin pages, carrier appointment
+# pages, NFIP reauthorization news: changes come to you.
+# Set a password in the app's settings after first run, and configure
+# a notification channel (email/ntfy/etc.) — alerts are the point.
+# The browser sidecar renders JavaScript-heavy pages for watching;
+# it's internal-only, nothing published.
+# VERIFY at deploy: the PLAYWRIGHT_DRIVER_URL port for the
+# sockpuppetbrowser image (8080 per its docs).
+services:
+  changedetection:
+    image: dgtlmoon/changedetection.io:0.70.3
+    container_name: changedetection
+    restart: unless-stopped
+    depends_on:
+      - browser
+    environment:
+      BASE_URL: http://ufo:3014
+      PLAYWRIGHT_DRIVER_URL: ws://browser:8080
+    ports:
+      - "3014:5000"
+    volumes:
+      - ./data:/datastore
+    labels:
+      - homepage.group=Tools
+      - homepage.name=ChangeDetection
+      - homepage.icon=changedetection
+      - homepage.href=http://ufo:3014
+      - homepage.description=Web page change alerts
+
+  browser:
+    image: dgtlmoon/sockpuppetbrowser:0.0.3
+    container_name: changedetection-browser
+    restart: unless-stopped
