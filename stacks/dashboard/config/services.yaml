@@ -12,6 +12,12 @@
         description: Docker management
         server: ufo
         container: arcane
+    - Web Terminal:
+        icon: ttyd.svg
+        href: http://ufo:7681
+        description: Host terminal — root shell, tailnet only
+        server: ufo
+        container: ttyd
     - Backrest:
         icon: backrest
         href: http://ufo:9898

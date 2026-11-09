@@ -1,0 +1,49 @@
+# ttyd — a real HOST terminal in the browser.
+#
+# HOW IT WORKS: the container runs privileged with the host's PID
+# namespace, and ttyd serves an `nsenter` shell that steps into the
+# host's namespaces and starts a login bash there. So the shell you get
+# is ufo itself — not a container shell.
+#
+# SECURITY — read before deploying: that makes this page a ROOT SHELL
+# ON UFO behind a single basic-auth password. Deploy it only with a
+# strong TTYD_PASSWORD (compose refuses to start without one), and
+# only ever reach it over the tailnet/LAN. Never port-forward it, never
+# tunnel it, never share its logs (ttyd prints the credential,
+# base64-encoded, in its startup log).
+services:
+  ttyd:
+    build: .
+    image: ufo/ttyd:1.7.7
+    container_name: ttyd
+    restart: unless-stopped
+    privileged: true
+    pid: host
+    ports:
+      - "7681:7681"
+    command:
+      - ttyd
+      - -W # writable — ttyd is read-only by default; a terminal you can't type in is a screensaver
+      - -p
+      - "7681"
+      - -c
+      - ${TTYD_USER:-justin}:${TTYD_PASSWORD:?set TTYD_PASSWORD in stacks/ttyd/.env}
+      - -t
+      - titleFixed=ufo terminal
+      - nsenter
+      - --target
+      - "1"
+      - --mount
+      - --uts
+      - --ipc
+      - --net
+      - --pid
+      - --
+      - /bin/bash
+      - -l
+    labels:
+      - homepage.group=Management
+      - homepage.name=Web Terminal
+      - homepage.icon=ttyd.svg
+      - homepage.href=http://ufo:7681
+      - homepage.description=Host terminal — root shell, tailnet only

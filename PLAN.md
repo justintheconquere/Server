@@ -180,6 +180,11 @@ hostnames become plain compose service names:
   (ZMQ 18083 + rpc-login are already in the config for it).
 - **Cockpit** (optional, OS-level GUI: updates, logs, storage, terminal) —
   `apt install cockpit`, port 9090, tailnet-only.
+- **ttyd web terminal** (added 2026-11-09, Justin's request): a host root
+  shell in a browser tab (:7681) — privileged container, `nsenter` into
+  the host, password-gated via stack `.env`, **tailnet-only**. The stack
+  README carries the safety rules (incl. never sharing its startup log —
+  ttyd prints the credential there, base64-encoded).
 
 ## Dashboard (front page) — DECIDED 2026-11-09: Homepage
 **Homepage** (gethomepage/homepage): lightweight, configured entirely in YAML

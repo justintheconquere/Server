@@ -324,8 +324,10 @@ Deploy from their stack folders (or Arcane) as wanted:
   Apps appear via the entries in `services.yaml` (one per app, each with its
   icon) plus Docker label auto-discovery.
 - **Bitcart, Chrome, Gluetun, SimpleX, Conduit, strfry, Goose, Haveno,
-  Haveno seednode, Arch + Phosh** — per their stack folders. SimpleX and
-  strfry identity keys are part of the Backrest scope from first start.
+  Haveno seednode, Arch + Phosh, ttyd (web terminal)** — per their stack
+  folders. SimpleX and strfry identity keys are part of the Backrest
+  scope from first start. ttyd is a password-gated root shell in a
+  browser tab (`ufo:7681`) — tailnet only, see `stacks/ttyd/README.md`.
 
 ---
 
@@ -336,6 +338,7 @@ Deploy from their stack folders (or Arcane) as wanted:
 | Service | Address | Exposure |
 |---|---|---|
 | Arcane | `ufo:3552` | tailnet/LAN |
+| Web Terminal (ttyd) | `ufo:7681` | **tailnet only** — root shell |
 | Dashboard (Homepage) | `ufo:3005` | tailnet/LAN |
 | Twenty | `ufo:3000` | tailnet only |
 | Poznote | `ufo:8040` | tailnet/LAN |
