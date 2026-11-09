@@ -1,0 +1,39 @@
+# BasicSwap DEX — see the Dockerfile header for the safety rules.
+# First start runs basicswap-prepare (entrypoint.sh), which downloads
+# the coin tooling into ./data — give it time and disk.
+# After prepare, point the Monero chain client at this box's own node
+# before trading: stop the stack and set the daemon address in
+# ./data/basicswap.json (chainclients -> monero; address
+# http://monerod:18081 plus the monerod stack's RPC login — VERIFY
+# the exact key names against the generated file at deploy), or set
+# it through the API. BTC/LTC can run as Electrum light wallets;
+# every other coin wants its own full node — add coins via COINS in
+# .env only when you're ready to host them.
+services:
+  basicswap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ufo/basicswap:0.19.1
+    container_name: basicswap
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+      COINS: ${COINS:-xmr}
+    ports:
+      - "12700:12700"
+    volumes:
+      - ./data:/data
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=Payments
+      - homepage.name=BasicSwap
+      - homepage.icon=basicswap.svg
+      - homepage.href=http://ufo:12700
+      - homepage.description=Atomic-swap DEX (BTC↔XMR)
+
+networks:
+  ufo-net:
+    external: true

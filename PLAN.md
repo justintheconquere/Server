@@ -234,6 +234,21 @@ hostnames become plain compose service names:
   switch by construction — no VPN, no traffic; its WebUI/peer ports
   are published in the gluetun stack, so Gluetun deploys first) +
   Prowlarr for indexer search.
+- **DEX + directory additions** (2026-11-09, Justin: "build both" +
+  the SimpleX registries): **Haveno** stacks rebuilt on a real image
+  — the stack Dockerfile builds the v1.9.0 daemon + seednode from
+  upstream source (no official image exists); the gRPC API (9998,
+  ufo-net only, password-gated) is the agent connection point, and
+  the stack README carries the network reality (a build defines its
+  network; confirm the offer board before funding, stagenet first
+  for agent wiring). **BasicSwap** (v0.19.1, source-built): local
+  JSON API on :12700, BTC↔XMR adaptor-signature atomic swaps, XMR
+  side pointed at the stack's own monerod; the API can spend its
+  wallets, so password + tailnet + tiny amounts. **SimpleX
+  Directory**: his own group-registry bot (upstream's directory
+  service from simplex-chat v7.1.2, source-built — the longest
+  build in the store), configured on first run with his SMP server;
+  runs alongside the official directory, not instead of it.
 - **Per-service Tor onions** (Justin's request, 2026-11-09): a stack
   that needs an onion gets a Tor sidecar (same getumbrel/tor image as
   monerod) with a stack-local torrc; keys live under the stack's

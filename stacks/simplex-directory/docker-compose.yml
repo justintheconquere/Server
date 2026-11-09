@@ -1,0 +1,59 @@
+# SimpleX Directory — your own group registry bot (see Dockerfile
+# header and README.md for the first-run sequence; the build is long,
+# and the first start is interactive on purpose).
+# The bot is a chat contact, not a web service: it publishes no ports.
+# The web service below is only a static status/help page. The bot
+# writes its public listing (listing.json + images) into
+# ./data/web — point any static host at that folder later if you
+# want the browsable directory page as well.
+services:
+  directory:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ufo/simplex-directory:7.1.2
+    container_name: simplex-directory
+    restart: unless-stopped
+    environment:
+      DIRECTORY_NAME: ${DIRECTORY_NAME:-ufo Directory}
+      DIRECTORY_SUPERUSERS: ${DIRECTORY_SUPERUSERS:-}
+    volumes:
+      - ./data:/data
+
+  # Static status page (the bot itself has no web UI).
+  web:
+    image: nginx:1.27-alpine
+    container_name: simplex-directory-web
+    restart: unless-stopped
+    ports:
+      - "8016:80"
+    command:
+      - sh
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'HTML'
+        <!doctype html>
+        <html><head><title>SimpleX Directory</title></head>
+        <body style="font-family:sans-serif;max-width:44em;margin:2em auto;padding:0 1em">
+        <h1>SimpleX Directory (your registry)</h1>
+        <p>This stack runs the SimpleX directory bot: a chat contact that
+        registers and searches groups, on your own server. It runs
+        alongside the official SimpleX directory — the same app can hold
+        both as contacts, and a group can be listed in either.</p>
+        <h2>Using it</h2>
+        <p>The bot's contact address is printed in its container log on
+        first run. Add it as a contact in SimpleX Chat, send
+        <code>/help</code>, and follow its prompts. Group owners invite
+        the bot to their group as an admin to list it.</p>
+        <h2>First run</h2>
+        <p>See the stack README: interactive setup (profile, your SMP
+        server, superusers), then a normal restart.</p>
+        </body></html>
+        HTML
+        exec nginx -g 'daemon off;'
+    labels:
+      - homepage.group=Comms
+      - homepage.name=SimpleX Directory
+      - homepage.icon=simplex-chat
+      - homepage.href=http://ufo:8016
+      - homepage.description=Your group registry bot

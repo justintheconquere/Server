@@ -1,21 +1,23 @@
 # Haveno seed node — operator side, for Justin's OWN Haveno network
-# instance. EXPERIMENTAL, same image problem as stacks/haveno (see its
-# README): no official image exists; the pinned daemon image is ARM64-only,
-# so expect a self-built amd64 image before this can run.
+# instance. EXPERIMENTAL. Image: built from upstream source by the
+# haveno stack's Dockerfile — this stack shares that build (context
+# ../haveno) and runs the seednode launcher from the same image.
 # A Haveno network is defined by its build (seed nodes, arbitrator, price
 # node baked into clients) — running this does NOT join RetoSwap.
 # The arbitrator is NOT a container: it is a role registered from a Haveno
 # client, manually, by Justin (see the status page text below).
 services:
   seednode:
-    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    build:
+      context: ../haveno
+      dockerfile: Dockerfile
+    image: ufo/haveno:1.9.0
     container_name: haveno-seednode
     restart: unless-stopped
-    # VERIFY against the final image: the haveno-seednode launcher must
-    # exist on its PATH (Gradle builds generate it; main class
-    # haveno.seednode.SeedNodeMain).
+    # VERIFY against the built image: the installDist launcher path
+    # (Gradle builds generate it; main class haveno.seednode.SeedNodeMain).
     entrypoint:
-      - "haveno-seednode"
+      - "/opt/haveno/seednode/bin/haveno-seednode"
     environment:
       HOME: "/seednode"
     command:
@@ -44,7 +46,10 @@ services:
   # profile and re-verify the flags.
   pricenode:
     profiles: ["disabled"]
-    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    build:
+      context: ../haveno
+      dockerfile: Dockerfile
+    image: ufo/haveno:1.9.0
     container_name: haveno-pricenode
     restart: unless-stopped
     environment:

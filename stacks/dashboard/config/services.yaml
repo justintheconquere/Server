@@ -162,6 +162,12 @@
         description: Own-network seed node (experimental)
         server: ufo
         container: haveno-seednode-web
+    - BasicSwap:
+        icon: basicswap.svg
+        href: http://ufo:12700
+        description: Atomic-swap DEX (BTC↔XMR)
+        server: ufo
+        container: basicswap
 
 - Infrastructure:
     - Monero Node:
@@ -200,6 +206,12 @@
         description: Voodoo Bazaar relay
         server: ufo
         container: strfry
+    - SimpleX Directory:
+        icon: simplex-chat
+        href: http://ufo:8016
+        description: Your group registry bot
+        server: ufo
+        container: simplex-directory-web
 
 - Tools:
     - Chrome:

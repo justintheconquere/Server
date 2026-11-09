@@ -5,15 +5,14 @@
 # anyone who reaches it AND has the API password has full wallet control.
 services:
   daemon:
-    # VERIFY — IMAGE (checked 2026-11-08, re-checked 2026-11-09): upstream
-    # haveno-dex publishes NO official container image, and the one
-    # published daemon image reference (Docker Hub havenodex/haveno-daemon,
-    # digest-pinned below) could NOT be confirmed on re-check — the org's
-    # verifiable image is a Monero node, not the daemon, and the 2024
-    # build was ARM64-only besides. Treat the pin below as a placeholder:
-    # expect a self-built amd64 image from github.com/haveno-dex/haveno
-    # (or the RetoSwap fork) before this can run.
-    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    # Image: built from upstream source by this stack's Dockerfile
+    # (haveno-dex publishes no container image). First build is long.
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ufo/haveno:1.9.0
+    # VERIFY at first run: the installDist launcher path in the image.
+    entrypoint: ["/opt/haveno/daemon/bin/haveno-daemon"]
     container_name: haveno-daemon
     restart: unless-stopped
     environment:

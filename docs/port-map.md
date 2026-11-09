@@ -59,6 +59,8 @@ internet by design.
 | 8080 | qBittorrent WebUI | torrents (published by gluetun) | tailnet/LAN |
 | 6881 | BitTorrent peers (TCP + UDP) | torrents (published by gluetun) | egress via VPN |
 | 9696 | Prowlarr | torrents | tailnet/LAN |
+| 12700 | BasicSwap (UI + JSON API) | basicswap | tailnet/LAN |
+| 8016 | SimpleX Directory status page (the service is a chat bot) | simplex-directory | tailnet/LAN |
 | — | Toolbox (scripts + cron) | toolbox | no published ports |
 
 Web UI on 8040; the MCP
