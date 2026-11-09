@@ -1,0 +1,55 @@
+# LocalAI — an OpenAI-compatible inference server with its own model
+# and backend gallery. REINSTATED 2026-11-09 at Justin's request
+# (dropped earlier the same day): he wants to experiment with it
+# because he may need to scale inference in the future. Ollama stays
+# the default runtime; LocalAI is the scale-out experiment — anything
+# that speaks the OpenAI API can be pointed at http://localai:8080
+# (ufo-net) or http://ufo:3018 (host).
+#
+# Image: upstream's CUDA 13 GPU build at the current release
+# (v4.12.1) — the same build family verified on this RTX 5090 on
+# 2026-11-06. Needs the NVIDIA container toolkit on the host first
+# (README Stage 2), like ComfyUI and the Ollama Docker variant.
+#
+# 5090 note (learned the hard way on umbrelOS): if inference runs at
+# CPU speed, the CUDA backend isn't loaded — in LocalAI's UI open
+# Backends and make sure the cuda13-llama-cpp backend is installed
+# and the model loads with GPU layers. Never accept a silent CPU
+# fallback as "working".
+#
+# Models (GGUF etc.) live in ./data/models; installed backends in
+# ./data/backends. The API key is optional on the tailnet — set
+# LOCALAI_API_KEY in .env to require one.
+services:
+  localai:
+    image: localai/localai:v4.12.1-gpu-nvidia-cuda-13
+    container_name: localai
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+      LOCALAI_API_KEY: ${LOCALAI_API_KEY:-}
+    ports:
+      - "3018:8080"
+    volumes:
+      - ./data/models:/models
+      - ./data/backends:/backends
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=AI
+      - homepage.name=LocalAI
+      - homepage.icon=localai
+      - homepage.href=http://ufo:3018
+      - homepage.description=Inference server — scaling experiments
+
+networks:
+  ufo-net:
+    external: true

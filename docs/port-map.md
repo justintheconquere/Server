@@ -54,6 +54,7 @@ internet by design.
 | 23000 | BTCPay Server | btcpay | tailnet/LAN (public face = pay.voodoobazaar.com via tunnel) |
 | 9090 | Cockpit (host package, not Docker) | — | tailnet/LAN |
 | 3017 | Dify (nginx front door) | dify | tailnet/LAN |
+| 3018 | LocalAI | localai | tailnet/LAN |
 | 3100 | Paperclip | paperclip | tailnet/LAN |
 | 8080 | qBittorrent WebUI | torrents (published by gluetun) | tailnet/LAN |
 | 6881 | BitTorrent peers (TCP + UDP) | torrents (published by gluetun) | egress via VPN |

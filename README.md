@@ -131,9 +131,9 @@ sudo usermod -aG docker $USER
 ```
 
 The NVIDIA container toolkit is deliberately **not** installed up
-front: the default AI path is native (Ollama, Stage 9). Two optional
-stacks ARE GPU containers — the Ollama Docker variant and ComfyUI.
-If you deploy either, install the toolkit first
+front: the default AI path is native (Ollama, Stage 9). Three optional
+stacks ARE GPU containers — the Ollama Docker variant, ComfyUI, and
+LocalAI. If you deploy any of them, install the toolkit first
 (<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>)
 and use a `--gpus all` test container as that stack's gate.
 
@@ -367,7 +367,7 @@ Deploy from their stack folders (or Arcane) as wanted:
   only, see `stacks/ttyd/README.md`. Gitea is the box's own git home
   (`ufo:3007`); Toolbox is the raw scripts + cron runner (no ports,
   Docker socket mounted on purpose — see `stacks/toolbox/README.md`).
-  The GPU stacks (ComfyUI, Ollama Docker variant) need the Stage 2
+  The GPU stacks (ComfyUI, Ollama Docker variant, LocalAI) need the Stage 2
   toolkit install first; the Ollama variant and the native install are
   alternatives — run one, never both (same port).
 

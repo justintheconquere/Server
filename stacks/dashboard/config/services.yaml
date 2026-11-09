@@ -106,6 +106,12 @@
         description: Image generation on the 5090
         server: ufo
         container: comfyui
+    - LocalAI:
+        icon: localai
+        href: http://ufo:3018
+        description: Inference server — scaling experiments
+        server: ufo
+        container: localai
     - Paperclip:
         icon: paperclip.svg
         href: http://ufo:3100

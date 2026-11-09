@@ -146,11 +146,18 @@ one folder per stack with `docker-compose.yml` + `.env.example`.
    - GATE 5 (mirrors the Nov 6 proof): `ollama ps` shows the model **100% in
      VRAM**; a warm qwen3.8 run should be in the ~140 tok/s class. If it
      loads on CPU, stop — that's the driver failure mode, not an Ollama bug.
-6. **LocalAI — DROPPED (Justin, 2026-11-09).** Reviewed after the build:
-   his local-AI use is setup and benchmarks, not a workload, and Ollama
-   covers local inference on its own. (The official CUDA 13 image made it
-   a clean stack; it was removed from the repo the same day it was added.
-   GPU verification lives in Gate 5 — Ollama's proof is the system's.)
+6. **LocalAI — REINSTATED (Justin, 2026-11-09 evening).** Dropped
+   earlier the same day (his use then was setup and benchmarks), then
+   brought back at his request: he wants to start experimenting with
+   it because he may need to scale inference in the future. Stack:
+   upstream's CUDA 13 GPU image at the current release
+   (`localai/localai:v4.12.1-gpu-nvidia-cuda-13` — the build family
+   verified on this 5090 on 2026-11-06), host :3018 (8080 now belongs
+   to qBittorrent), on ufo-net as an OpenAI-compatible endpoint
+   (`http://localai:8080`). Needs the container toolkit (Stage 2).
+   Ollama remains the default local runtime — GPU verification still
+   lives in Gate 5 — and the Nov 6 lesson is in the stack header:
+   never accept a silent CPU fallback as working.
 7. **Twenty CRM** — official compose stack (server + worker + postgres:16 +
    redis), pinned version (v2.56.1 or current stable at build time).
    Fresh database, fresh admin signup (Justin's step, first signup = admin).
