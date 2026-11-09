@@ -35,7 +35,7 @@ Nothing is migrated. Two 30-second exceptions, Justin's call each:
    ```
    Skipped = the onion address changes forever. Nothing on-chain depends on it.
 2. Nothing else. Twenty was likely never populated (admin signup unconfirmed);
-   Ollama/LocalAI models re-download; the chain re-syncs (Stage 4).
+   Ollama models re-download; the chain re-syncs (Stage 4).
 
 **Point of no return:** starting the Ubuntu installer in Stage 1. Before that,
 rollback is "do nothing — umbrelOS is untouched." After it, rollback to
@@ -133,11 +133,11 @@ one folder per stack with `docker-compose.yml` + `.env.example`.
    - GATE 5 (mirrors the Nov 6 proof): `ollama ps` shows the model **100% in
      VRAM**; a warm qwen3.8 run should be in the ~140 tok/s class. If it
      loads on CPU, stop — that's the driver failure mode, not an Ollama bug.
-6. **LocalAI** — official version-pinned CUDA 13 image
-   (`localai/localai:<ver>-gpu-nvidia-cuda-13`). **No hand-built backend** —
-   backends download as OCI images at runtime now. Reinstall gpt-oss-20b.
-   - GATE 6: startup log shows CUDA devices found (sm_120); long-prompt test
-     in the ~1s class (vs ~38s CPU baseline from Nov 6).
+6. **LocalAI — DROPPED (Justin, 2026-11-09).** Reviewed after the build:
+   his local-AI use is setup and benchmarks, not a workload, and Ollama
+   covers local inference on its own. (The official CUDA 13 image made it
+   a clean stack; it was removed from the repo the same day it was added.
+   GPU verification lives in Gate 5 — Ollama's proof is the system's.)
 7. **Twenty CRM** — official compose stack (server + worker + postgres:16 +
    redis), pinned version (v2.56.1 or current stable at build time).
    Fresh database, fresh admin signup (Justin's step, first signup = admin).
@@ -164,7 +164,7 @@ hostnames become plain compose service names:
 - **Bitcart** (XMR-only, side-by-side test), **Chrome** (linuxserver/chrome),
   **Gluetun**, **SimpleX** (SMP + XFTP; identity keys into Backrest scope),
   **Conduit** (server name = AssureBay domain from day one), **strfry**,
-  **Goose** (headless, pointed at Ollama/LocalAI), **Haveno client +
+  **Goose** (headless, pointed at Ollama), **Haveno client +
   seednode**, **Arch + Phosh** container (the phone-GUI want survives as a
   plain container — nothing about it needed Umbrel).
 - **XMR P2Pool rig** stays its own project (planning-only so far); on the
@@ -188,7 +188,7 @@ deployment instructions and documentation. Proposed layout as stacks land:
 ```
 README.md            # rebuild runbook: this plan, condensed
 stacks/
-  arcane/  poznote/  cloudflared/  monerod/  ollama/  localai/
+  arcane/  poznote/  cloudflared/  monerod/  ollama/
   twenty/  btcpay/   bitcart/      backrest/ dashboard/ …
   (each: docker-compose.yml, .env.example, README notes)
 docs/                # decisions, port map, address book (IPs, onions, URLs)
@@ -201,8 +201,7 @@ where upstream forces it; **no real secrets, ever** — a pre-commit check for
 - Everything on ufo is down from the wipe until its stage completes.
   Same-day: OS, GPU stack, Arcane, Poznote, Twenty, Ollama (plus model
   download time). Long tail: **monerod sync** (pruned: plan on days, runs
-  unattended; BTCPay waits for it). LocalAI model + backend downloads after
-  Gate 2 are quick.
+  unattended; BTCPay waits for it).
 - Nothing else in Justin's world depends on ufo being up minute-to-minute
   (AssureBay site/leads run on Cloudflare/Google), except Poznote access
   for Muse — hence its early slot in Stage 4.

@@ -23,7 +23,6 @@ internet by design.
 | 8014 | Haveno seed node status page | haveno-seednode | tailnet/LAN |
 | 8015 | Arch + Phosh (noVNC) | arch-phosh | tailnet/LAN |
 | 5225 | SimpleX help page | simplex | tailnet/LAN |
-| 8080 | LocalAI API | localai | tailnet/LAN |
 | 8040 | Poznote web UI | poznote | tailnet/LAN |
 | 8045 | Poznote MCP server | poznote | tailnet/LAN, token-auth |
 | 8888 | Gluetun HTTP proxy | gluetun | tailnet/LAN |

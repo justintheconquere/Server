@@ -54,12 +54,6 @@
         description: LLM runtime (API)
         server: ufo
         container: ollama
-    - LocalAI:
-        icon: localai
-        href: http://ufo:8080
-        description: LLM API (OpenAI-compatible)
-        server: ufo
-        container: localai
     - Goose:
         icon: goose.svg
         href: http://ufo:8012

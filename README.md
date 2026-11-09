@@ -45,7 +45,6 @@ stacks/
   cloudflared/       # Cloudflare Tunnel connector
   monerod/           # Monero node (+ tor sidecar)
   ollama/            # LLM runtime (GPU)
-  localai/           # LLM runtime (GPU, OpenAI-compatible API)
   twenty/            # Twenty CRM
   btcpay/            # BTCPay Server, Monero-only
   bitcart/           # Bitcart (side-by-side test)
@@ -276,22 +275,7 @@ qwen3.8 run should be in the ~140 tok/s class (the verified figure from the
 old system). CPU in the `ollama ps` output = driver problem back at Gate 2,
 not an Ollama problem.
 
-## Stage 10 — LocalAI (GPU)
-
-Uses the **official CUDA 13 image** (`localai/localai:<version>-gpu-nvidia-cuda-13`,
-pinned) — backends download automatically at runtime; there is no hand-built
-backend on this system.
-
-```
-cd ~/server-config/stacks/localai && docker compose up -d
-```
-
-Install the `gpt-oss-20b` model from the UI/API as before.
-
-**Gate 6:** the startup log reports CUDA devices found (sm_120), and a long
-prompt completes in the ~1 s class (CPU baseline was ~38 s).
-
-## Stage 11 — Twenty CRM
+## Stage 10 — Twenty CRM
 
 ```
 cd ~/server-config/stacks/twenty && docker compose up -d
@@ -308,7 +292,7 @@ curl --fail http://ufo:3000/healthz
   Partners) is built afterwards as Twenty custom objects from the data
   dictionary in the `assurebay-crm` repo.
 
-## Stage 12 — Everything else
+## Stage 11 — Everything else
 
 Deploy from their stack folders (or Arcane) as wanted:
 
@@ -346,7 +330,6 @@ Deploy from their stack folders (or Arcane) as wanted:
 | Poznote | `ufo:8040` | tailnet/LAN |
 | Poznote MCP | `ufo:8045` | tailnet/LAN, token-auth |
 | Ollama API | `ufo:11434` | tailnet/LAN |
-| LocalAI API | `ufo:8080` | tailnet/LAN |
 | monerod RPC | `ufo:18081` (login required) | LAN/tailnet |
 | monerod restricted RPC | `ufo:18089` | LAN/tailnet |
 | monerod ZMQ | `ufo:18083` | local networks (P2Pool) |
