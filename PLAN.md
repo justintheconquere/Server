@@ -208,6 +208,15 @@ hostnames become plain compose service names:
   private script/config repos) and **Toolbox** (a raw scripts + cron
   container for machine-level jobs; Docker socket mounted deliberately,
   no published ports).
+- **Per-service Tor onions** (Justin's request, 2026-11-09): a stack
+  that needs an onion gets a Tor sidecar (same getumbrel/tor image as
+  monerod) with a stack-local torrc; keys live under the stack's
+  `data/` — gitignored, in Backrest scope, backed up like a wallet
+  seed. First one built: **BTCPay** (the Voodoo plan always called for
+  BTCPay's own onion so Tor buyers aren't bounced to clearnet; finish
+  the wiring by setting `BTCPAY_ADDITIONALHOSTS` from
+  `data/tor/btcpay/hostname` after first start). Rule: onions only for
+  services meant to be reached — never for tailnet-only admin apps.
 
 ## Dashboard (front page) — DECIDED 2026-11-09: Homepage
 **Homepage** (gethomepage/homepage): lightweight, configured entirely in YAML

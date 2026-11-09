@@ -21,8 +21,11 @@ services:
       BTCPAY_POSTGRES: "Host=db;Database=btcpay;Username=btcpay;Password=${PG_PASSWORD}"
       BTCPAY_NETWORK: mainnet
       BTCPAY_HOST: https://pay.voodoobazaar.com
-      # When the BTCPay .onion exists, add it:
-      # BTCPAY_ADDITIONALHOSTS: "http://<onion>"
+      # BTCPay's own onion (tor sidecar below): after its first start,
+      # read ./data/tor/btcpay/hostname and set:
+      # BTCPAY_ADDITIONALHOSTS: "http://<that-onion>"
+      # then restart the stack, so links generated on the onion stay on
+      # the onion instead of bouncing buyers to clearnet.
       BTCPAY_XMR_DAEMON_URI: http://monerod:18081
       BTCPAY_XMR_WALLET_DAEMON_URI: http://wallet:18082
       BTCPAY_XMR_WALLET_DAEMON_WALLETDIR: /walletdata
@@ -74,6 +77,21 @@ services:
     networks:
       - default
       - ufo-net
+
+  # BTCPay's own Tor onion service (see torrc in this folder and the
+  # README). Same Tor image/contract as the monerod stack. The keys
+  # generate into ./data/tor/btcpay/ on first start; the address is
+  # ./data/tor/btcpay/hostname once Tor has bootstrapped.
+  tor:
+    image: ghcr.io/getumbrel/tor:0.4.9.11
+    container_name: btcpay-tor
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ./torrc:/etc/tor/torrc:ro
+      - ./data/tor:/data
+    networks:
+      - default
 
 networks:
   ufo-net:

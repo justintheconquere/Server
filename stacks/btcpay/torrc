@@ -1,0 +1,10 @@
+# Tor config for the BTCPay stack — BTCPay's own onion service, so Tor
+# buyers reach checkout without being bounced to clearnet (the Voodoo
+# Bazaar plan gives the storefront and BTCPay separate v3 onions).
+#
+# The hidden-service keys live in ./data/tor/btcpay/ — that folder IS
+# the onion address. Back it up like a wallet seed: lose it and the
+# address is gone forever, with every shared link pointing at it.
+# (It's under data/, so git ignores it and Backrest covers it.)
+HiddenServiceDir /data/btcpay
+HiddenServicePort 80 server:8080
