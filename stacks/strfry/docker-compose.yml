@@ -1,0 +1,25 @@
+# strfry — Nostr relay for Voodoo Bazaar (seller identity, NIP-05, Shopstr).
+# Public face: wss://relay.voodoobazaar.com via the cloudflared stack,
+# once DNS is set. The relay config is a real file in this folder
+# (strfry.conf) — edit it, then restart the service.
+# Pinned to dockurr/strfry 1.1.3 (verified 2026-11-09; bare semver, no v).
+# The official upstream image is ghcr.io/hoytech/strfry (latest-only tags)
+# if provenance matters more than pinning.
+services:
+  relay:
+    image: dockurr/strfry:1.1.3
+    container_name: strfry
+    restart: unless-stopped
+    ports:
+      - "7777:7777"
+    volumes:
+      # strfry.conf + the LMDB event database (strfry-db/) live here.
+      - ./data:/data
+      - ./strfry.conf:/etc/strfry.conf:ro
+    command: ["strfry", "--config=/etc/strfry.conf", "relay"]
+    labels:
+      - homepage.group=Comms
+      - homepage.name=strfry (Nostr)
+      - homepage.icon=strfry.svg
+      - homepage.href=http://ufo:7777
+      - homepage.description=Voodoo Bazaar relay

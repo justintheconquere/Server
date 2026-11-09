@@ -1,0 +1,14 @@
+# Tor config for the monerod stack.
+# SOCKS for monerod's --tx-proxy (internal to the stack network only).
+SocksPort 0.0.0.0:9050
+
+# RPC hidden service — this is the fo4z...fmyd.onion service IF the saved
+# keys were placed in ./tor-data/app-monero-rpc/ before first start;
+# otherwise Tor generates a fresh address here on first run.
+HiddenServiceDir /data/app-monero-rpc
+HiddenServicePort 18081 monerod:18081
+
+# P2P hidden service (inbound onion peers). Optional — enable by also
+# adding --anonymous-inbound to monerod. Keys in /data/app-monero-p2p.
+# HiddenServiceDir /data/app-monero-p2p
+# HiddenServicePort 18080 monerod:9901

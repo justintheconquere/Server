@@ -1,0 +1,68 @@
+# monerod — the one shared Monero node for BTCPay, P2Pool and wallets.
+# Same image the Umbrel app used. PRUNED by default (see .env to change).
+# RPC login is deliberately ON here (on umbrelOS it never actually was).
+services:
+  monerod:
+    image: ghcr.io/sethforprivacy/simple-monerod:v0.18.5.4
+    container_name: monerod
+    restart: unless-stopped
+    user: "1000:1000"
+    ports:
+      - "18080:18080" # P2P (public by design)
+      - "18081:18081" # RPC (login required) — LAN/tailnet only, do not forward
+      - "18083:18083" # ZMQ pub — for P2Pool
+      - "18089:18089" # restricted RPC — wallets
+    volumes:
+      - ./data:/home/monero/.bitmonero
+    command:
+      - --rpc-bind-ip=0.0.0.0
+      - --rpc-bind-port=18081
+      - --rpc-login=${MONERO_RPC_USER}:${MONERO_RPC_PASS}
+      - --rpc-restricted-bind-ip=0.0.0.0
+      - --rpc-restricted-bind-port=18089
+      - --zmq-pub=tcp://0.0.0.0:18083
+      - --p2p-bind-ip=0.0.0.0
+      - --p2p-bind-port=18080
+      - --public-node
+      - --confirm-external-bind
+      - --prune-blockchain=${PRUNE_BLOCKCHAIN:-1}
+      - --out-peers=12
+      - --in-peers=12
+      - --limit-rate-up=1048576
+      - --limit-rate-down=1048576
+      # Relay transactions through the tor sidecar (clearnet identity stays
+      # off the tx path, same as the Umbrel setup). Remove if tor is removed.
+      - --tx-proxy=tor,tor:9050
+    networks:
+      - default
+      # Shared network: BTCPay, Bitcart and Haveno reach the daemon as
+      # http://monerod:18081 (with the RPC login from their own .env files).
+      - ufo-net
+    labels:
+      - homepage.group=Infrastructure
+      - homepage.name=Monero Node
+      - homepage.icon=monero
+      - homepage.description=monerod (RPC on 18081)
+
+  # Tor sidecar — carries the RPC hidden service. If the pre-wipe key folders
+  # were saved (see README Stage 0), drop them into ./tor-data/ before first
+  # start and the old .onion address survives. tor-data/ is gitignored:
+  # those keys are private keys, never commit them.
+  tor:
+    # The Umbrel tor image: its contract (torrc at /etc/tor/torrc, data at
+    # /data, uid 1000) is verified from the umbrel-apps source. If the pull
+    # ever fails, osminogin/tor-simple:0.4.9.16 is the maintained fallback
+    # (adjust the torrc/data paths to its docs).
+    image: ghcr.io/getumbrel/tor:0.4.9.11
+    container_name: monerod-tor
+    restart: unless-stopped
+    user: "1000:1000"
+    volumes:
+      - ./torrc:/etc/tor/torrc:ro
+      - ./tor-data:/data
+    depends_on:
+      - monerod
+
+networks:
+  ufo-net:
+    external: true

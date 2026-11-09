@@ -1,0 +1,172 @@
+# Bitcart — XMR ONLY, bundled for side-by-side testing against BTCPay.
+# (Verdict stands: BTCPay is the Voodoo Bazaar engine — plugins. Bitcart is
+# the lighter fallback / personal-store option.)
+# One-domain mode: the `web` Caddy proxy is the only published port and
+# routes / -> store, /admin -> admin, /api -> api.
+# Bitcart's own setup.sh/configurator is intentionally NOT used; this frozen
+# compose is the equivalent. Several VERIFY notes from the packaging pass
+# remain — check them at first deploy.
+services:
+  web:
+    image: caddy:2.8.4-alpine
+    container_name: bitcart-web
+    restart: unless-stopped
+    depends_on:
+      - api
+      - admin
+      - store
+    ports:
+      - "3003:80"
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /data
+        cat > /data/Caddyfile <<'EOF'
+        :80 {
+          handle /api/* {
+            reverse_proxy api:8000
+          }
+          handle /admin* {
+            reverse_proxy admin:80
+          }
+          handle {
+            reverse_proxy store:80
+          }
+        }
+        EOF
+        exec caddy run --config /data/Caddyfile --adapter caddyfile
+    volumes:
+      - ./data/caddy:/data
+    labels:
+      - homepage.group=Payments
+      - homepage.name=Bitcart (test)
+      - homepage.icon=bitcart.svg
+      - homepage.href=http://ufo:3003
+      - homepage.description=XMR store — side-by-side test
+
+  api:
+    image: bitcart/bitcart:stable
+    container_name: bitcart-api
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+      - daemon-xmr
+    # VERIFY: 0.11.x launches components via `just` tasks; confirm the api
+    # task name in the image's Justfile at first deploy.
+    command: ["just", "api"]
+    environment:
+      # Test domain for one-domain mode. The cloudflared route for
+      # bitcart.voodoobazaar.com -> localhost:3003 is added only while
+      # actively testing.
+      BITCART_HOST: https://bitcart.voodoobazaar.com
+      BITCART_CRYPTOS: xmr
+      # VERIFY: newer Bitcart reads ENABLED_CRYPTOS instead; both are set,
+      # remove the dead one once confirmed against 0.11.x.
+      ENABLED_CRYPTOS: xmr
+      # VERIFY: env name for the root path setting (ROOT_PATH in settings).
+      ROOT_PATH: /api
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: bitcart
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      XMR_HOST: daemon-xmr
+      XMR_PORT: "${XMR_DAEMON_PORT:-18083}"
+      XMR_LOGIN: bitcart
+      XMR_PASSWORD: ${XMR_DAEMON_PASSWORD}
+    volumes:
+      - ./data/api:/app/data
+
+  worker:
+    image: bitcart/bitcart:stable
+    container_name: bitcart-worker
+    restart: unless-stopped
+    depends_on:
+      - api
+    # VERIFY: `just` task name for the worker, as with the api service.
+    command: ["just", "worker"]
+    environment:
+      BITCART_HOST: https://bitcart.voodoobazaar.com
+      BITCART_CRYPTOS: xmr
+      ENABLED_CRYPTOS: xmr
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_USER: bitcart
+      DB_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      XMR_HOST: daemon-xmr
+      XMR_PORT: "${XMR_DAEMON_PORT:-18083}"
+      XMR_LOGIN: bitcart
+      XMR_PASSWORD: ${XMR_DAEMON_PASSWORD}
+    volumes:
+      - ./data/api:/app/data
+
+  daemon-xmr:
+    # In Bitcart 0.11.x the XMR daemon also ships as its own image
+    # (bitcart/bitcart-xmr). This stack keeps the in-image daemon via the
+    # `just` task below; if that task is gone in the :stable build, switch
+    # this service to bitcart/bitcart-xmr (same env vars).
+    # Either way it speaks Monero RPC to the shared monerod over ufo-net.
+    # NOTE: pin :stable, never :latest — Bitcart's latest tag is stale.
+    image: bitcart/bitcart:stable
+    container_name: bitcart-daemon-xmr
+    restart: unless-stopped
+    # VERIFY: `just daemon xmr` task form (0.11.x).
+    command: ["just", "daemon", "xmr"]
+    environment:
+      XMR_NETWORK: mainnet
+      XMR_HOST: 0.0.0.0
+      XMR_PORT: "${XMR_DAEMON_PORT:-18083}"
+      XMR_LOGIN: bitcart
+      XMR_PASSWORD: ${XMR_DAEMON_PASSWORD}
+      # Upstream node URL with the RPC login embedded.
+      # VERIFY: that the daemon accepts user:password@ in XMR_SERVER
+      # (monero-python RPC client). If it needs separate fields, this is
+      # the line to change — do NOT fall back to a public node.
+      XMR_SERVER: http://${MONERO_RPC_USER}:${MONERO_RPC_PASS}@monerod:18081
+    networks:
+      - default
+      - ufo-net
+
+  admin:
+    # VERIFY: admin image/tag (bitcart/bitcart-admin, 0.8.0.0) and that its
+    # internal port is 80.
+    image: bitcart/bitcart-admin:0.8.0.0
+    container_name: bitcart-admin
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  store:
+    # VERIFY: store image/tag (bitcart/bitcart-store, 0.8.0.0) and port.
+    image: bitcart/bitcart-store:0.8.0.0
+    container_name: bitcart-store
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  db:
+    image: postgres:15-alpine
+    container_name: bitcart-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bitcart
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: bitcart
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: bitcart-redis
+    restart: unless-stopped
+    volumes:
+      - ./data/redis:/data
+
+networks:
+  ufo-net:
+    external: true

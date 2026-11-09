@@ -1,0 +1,146 @@
+---
+# Homepage tiles. One entry per app: name, icon, link, blurb, and the
+# Docker container to watch for status (server: ufo refers to docker.yaml).
+# Icons: a bare slug loads from the dashboard-icons set; a "name.svg"
+# loads the generated icon from ../icons. Edit + restart the dashboard
+# stack to apply.
+
+- Management:
+    - Arcane:
+        icon: arcane
+        href: http://ufo:3552
+        description: Docker management
+        server: ufo
+        container: arcane
+    - Backrest:
+        icon: backrest
+        href: http://ufo:9898
+        description: Backups (restic → USB)
+        server: ufo
+        container: backrest
+    - Cockpit:
+        icon: cockpit
+        href: http://ufo:9090
+        description: OS management (host package)
+    - Tailscale:
+        icon: tailscale
+        href: https://login.tailscale.com/admin/machines
+        description: Tailnet admin console
+
+- Business:
+    - Twenty CRM:
+        icon: twenty.svg
+        href: http://ufo:3000
+        description: AssureBay CRM
+        server: ufo
+        container: twenty-server
+    - Poznote:
+        icon: poznote.svg
+        href: http://ufo:8040
+        description: Plans and notes
+        server: ufo
+        container: poznote
+    - Client Portal (pilot):
+        icon: twenty.svg
+        href: http://ufo:3002
+        description: Twenty customer portal — pilot
+        server: ufo
+        container: twenty-portal
+
+- AI:
+    - Ollama:
+        icon: ollama
+        href: http://ufo:11434
+        description: LLM runtime (API)
+        server: ufo
+        container: ollama
+    - LocalAI:
+        icon: localai
+        href: http://ufo:8080
+        description: LLM API (OpenAI-compatible)
+        server: ufo
+        container: localai
+    - Goose:
+        icon: goose.svg
+        href: http://ufo:8012
+        description: Headless agent (experimental)
+        server: ufo
+        container: goose-web
+
+- Payments:
+    - BTCPay (Monero):
+        icon: btcpay-server
+        href: https://pay.voodoobazaar.com
+        description: Voodoo Bazaar payments
+        server: ufo
+        container: btcpay-server
+    - Bitcart (test):
+        icon: bitcart.svg
+        href: http://ufo:3003
+        description: XMR store — side-by-side test
+        server: ufo
+        container: bitcart-web
+    - Haveno:
+        icon: haveno.svg
+        href: http://ufo:8013
+        description: DEX daemon (experimental)
+        server: ufo
+        container: haveno-web
+    - Haveno Seed Node:
+        icon: haveno.svg
+        href: http://ufo:8014
+        description: Own-network seed node (experimental)
+        server: ufo
+        container: haveno-seednode-web
+
+- Infrastructure:
+    - Monero Node:
+        icon: monero
+        href: http://ufo:18081/get_info
+        description: monerod (RPC, login required)
+        server: ufo
+        container: monerod
+    - Gluetun:
+        icon: gluetun
+        href: http://ufo:8010
+        description: VPN + proxy :8888
+        server: ufo
+        container: gluetun-web
+    - Cloudflare:
+        icon: cloudflare
+        href: https://dash.cloudflare.com
+        description: Tunnel + DNS (external)
+
+- Comms:
+    - SimpleX Server:
+        icon: simplex-chat
+        href: http://ufo:5225
+        description: Private SMP + XFTP relays
+        server: ufo
+        container: simplex-web
+    - Conduit (Matrix):
+        icon: matrix
+        href: http://ufo:6167
+        description: Matrix homeserver
+        server: ufo
+        container: conduit
+    - strfry (Nostr):
+        icon: strfry.svg
+        href: http://ufo:7777
+        description: Voodoo Bazaar relay
+        server: ufo
+        container: strfry
+
+- Tools:
+    - Chrome:
+        icon: chrome
+        href: http://ufo:3004
+        description: Browser on the box
+        server: ufo
+        container: chrome
+    - Arch + Phosh:
+        icon: arch-phosh.svg
+        href: http://ufo:8015
+        description: Phone desktop in the browser
+        server: ufo
+        container: arch-phosh-web

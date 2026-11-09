@@ -1,0 +1,38 @@
+# Conduit — lightweight Matrix homeserver (for the AssureBay portal).
+# !!! READ THE WARNING IN .env.example BEFORE FIRST START !!!
+# The server name is baked into every user ID, room ID and event the server
+# ever creates. It can NEVER be changed without starting over empty.
+# No proxy auth in front: Matrix clients must reach the homeserver
+# directly. Public reach (when wanted) is via the cloudflared tunnel.
+services:
+  server:
+    # Conduit per Justin's 2026-11-08 decision. Tag verified 2026-11-09
+    # (v0.10.15, still publishing). NOTE: the maintained successor in the
+    # same family is Tuwunel (ghcr.io/matrix-construct/tuwunel, v1.9.4;
+    # default port 8008 — set TUWUNEL_PORT). Tuwunel migrates a Conduit
+    # database in place, so switching later is a stack edit, not a rebuild.
+    image: matrixconduit/matrix-conduit:v0.10.15
+    container_name: conduit
+    restart: unless-stopped
+    ports:
+      - "6167:6167"
+    environment:
+      CONDUIT_SERVER_NAME: ${CONDUIT_SERVER_NAME}
+      CONDUIT_DATABASE_PATH: /data
+      CONDUIT_PORT: "6167"
+      CONDUIT_ADDRESS: 0.0.0.0
+      # Registration closed: the agency provisions portal accounts.
+      CONDUIT_ALLOW_REGISTRATION: "false"
+      CONDUIT_ALLOW_FEDERATION: "true"
+      CONDUIT_TRUSTED_SERVERS: '["matrix.org"]'
+      CONDUIT_MAX_REQUEST_SIZE: "20000000"
+    volumes:
+      # RocksDB database + media + signing keys. This IS the homeserver —
+      # it is in the Backrest scope.
+      - ./data:/data
+    labels:
+      - homepage.group=Comms
+      - homepage.name=Conduit (Matrix)
+      - homepage.icon=matrix
+      - homepage.href=http://ufo:6167
+      - homepage.description=Matrix homeserver

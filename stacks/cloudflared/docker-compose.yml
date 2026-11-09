@@ -1,0 +1,14 @@
+# cloudflared — Cloudflare Tunnel connector. The tunnel itself lives in
+# Cloudflare and survived the rebuild; this just re-runs the connector.
+# Routes ONLY the public own-auth services (today: BTCPay at
+# pay.voodoobazaar.com). Ingress rules are configured in the Cloudflare
+# dashboard (remotely-managed tunnel) — nothing else belongs in the tunnel.
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.7
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TUNNEL_TOKEN}
+    # Host networking so tunnel origins on 127.0.0.1 (e.g. BTCPay's port)
+    # resolve exactly as configured in the Cloudflare dashboard.
+    network_mode: host

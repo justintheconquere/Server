@@ -1,0 +1,84 @@
+# Twenty CRM — official stack (server + worker + PostgreSQL + Redis).
+# Pinned to v2.56.1: the version verified running on ufo (2026-11-07).
+# v2.57.0 was released 2026-11-09 — bump both image tags deliberately
+# after a look at its release notes, never by accident.
+# TAILNET ONLY: no tunnel route, no port forwarding (decision 2026-11-07).
+# SERVER_URL must be the exact address used in the browser — Twenty
+# hard-wires it into links/redirects. Use the MagicDNS name or the 100.x
+# address, NEVER a .local name (phones can't resolve those; this exact
+# issue broke Twenty on umbrelOS).
+services:
+  server:
+    image: twentycrm/twenty:v2.56.1
+    container_name: twenty-server
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "3000:3000"
+    environment:
+      SERVER_URL: ${TWENTY_SERVER_URL}
+      FRONTEND_URL: ${TWENTY_SERVER_URL}
+      PG_DATABASE_URL: postgres://twenty:${PG_PASSWORD}@db:5432/default
+      REDIS_URL: redis://redis:6379
+      APP_SECRET: ${APP_SECRET}
+      STORAGE_TYPE: local
+      SIGN_IN_PREFILLED: "false"
+    volumes:
+      - ./data/server-local-data:/app/packages/twenty-server/.local-storage
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:3000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=Business
+      - homepage.name=Twenty CRM
+      - homepage.icon=twenty.svg
+      - homepage.href=http://ufo:3000
+      - homepage.description=AssureBay CRM
+
+  worker:
+    image: twentycrm/twenty:v2.56.1
+    container_name: twenty-worker
+    restart: unless-stopped
+    # The worker MUST run: without it, background jobs (reminders, sync)
+    # silently fail.
+    command: yarn worker:prod
+    depends_on:
+      - server
+    environment:
+      SERVER_URL: ${TWENTY_SERVER_URL}
+      FRONTEND_URL: ${TWENTY_SERVER_URL}
+      PG_DATABASE_URL: postgres://twenty:${PG_PASSWORD}@db:5432/default
+      REDIS_URL: redis://redis:6379
+      APP_SECRET: ${APP_SECRET}
+      STORAGE_TYPE: local
+      DISABLE_DB_MIGRATIONS: "true"
+    volumes:
+      - ./data/server-local-data:/app/packages/twenty-server/.local-storage
+
+  db:
+    image: postgres:16
+    container_name: twenty-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: twenty
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: default
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.4-alpine
+    container_name: twenty-redis
+    restart: unless-stopped
+    command: redis-server --maxmemory-policy noeviction
+
+networks:
+  ufo-net:
+    external: true

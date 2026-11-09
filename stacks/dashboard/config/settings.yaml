@@ -1,0 +1,31 @@
+---
+title: ufo
+description: Home server dashboard
+theme: dark
+color: slate
+headerStyle: clean
+useEqualHeights: true
+hideVersion: true
+
+layout:
+  Management:
+    style: row
+    columns: 4
+  Business:
+    style: row
+    columns: 4
+  AI:
+    style: row
+    columns: 4
+  Payments:
+    style: row
+    columns: 4
+  Infrastructure:
+    style: row
+    columns: 4
+  Comms:
+    style: row
+    columns: 4
+  Tools:
+    style: row
+    columns: 4

@@ -1,0 +1,37 @@
+# Backrest (restic) — backups to the external 1TB USB drive.
+# Drive: ext4, label ufo-backup, mounted at /mnt/ufo-backup on the host.
+# In Backrest, create a repo at /backup-repo and plans for the sources
+# below. A pre-backup hook must check the drive is mounted (mountpoint -q
+# /mnt/ufo-backup on the host / check /backup-repo is not empty-dir) and
+# abort otherwise — never back up into an empty folder on the NVMe.
+# The restic repo password goes in a password manager: lose it, lose the
+# backups. Scope: stack configs + app databases + identity data.
+# EXCLUDED: AI models and the Monero chain (re-creatable).
+services:
+  server:
+    image: garethgeorge/backrest:v1.14.1
+    container_name: backrest
+    restart: unless-stopped
+    ports:
+      - "9898:9898"
+    environment:
+      BACKREST_PORT: "9898"
+      BACKREST_DATA: /data
+      BACKREST_CONFIG: /data/config/config.json
+      TZ: America/New_York
+      XDG_CACHE_HOME: /cache
+    volumes:
+      - ./data:/data
+      - ./cache:/cache
+      - ./tmp:/tmp
+      # The USB backup target.
+      - /mnt/ufo-backup:/backup-repo
+      # Backup SOURCES: the whole stacks tree (compose files, .env files,
+      # and every stack's data dir), read-only.
+      - ${STACKS_DIR}:/backup-sources/stacks:ro
+    labels:
+      - homepage.group=Management
+      - homepage.name=Backrest
+      - homepage.icon=backrest
+      - homepage.href=http://ufo:9898
+      - homepage.description=Backups (restic → USB)

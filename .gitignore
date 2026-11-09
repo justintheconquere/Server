@@ -1,0 +1,14 @@
+# Real secrets live on the box only — never commit them.
+.env
+**/.env
+!**/.env.example
+
+# Runtime data (bind mounts live next to the stacks on the box)
+**/data/
+stacks/monerod/tor-data/
+stacks/poznote/data/
+
+# Local scratch
+*.dump
+*.local.md
+.DS_Store

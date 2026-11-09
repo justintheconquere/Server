@@ -1,0 +1,47 @@
+# Twenty customer portal (community project: lilremark/twentycrmclientportal).
+# !!! PILOT ONLY — read README.md in this folder before deploying. !!!
+# Third-party code that shows customers their CRM data: vet it, run it
+# tailnet-only first, and only expose it publicly after review.
+# The portal reaches Twenty over the shared ufo-net network as
+# http://twenty:3000. The Twenty API key lives server-side only (this
+# stack's .env on the box) and never reaches the browser.
+services:
+  app:
+    image: lilremark/twentycrmclientportal:2.1.1
+    container_name: twenty-portal
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "3002:3000"
+    environment:
+      DATABASE_URL: postgres://portal:${PORTAL_DB_PASSWORD}@db:5432/portal
+      TWENTY_BASE_URL: http://twenty:3000
+      TWENTY_API_KEY: ${TWENTY_API_KEY}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      # Replace with the real public portal URL before any public use.
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-https://portal.example.com}
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=Business
+      - homepage.name=Client Portal (pilot)
+      - homepage.icon=twenty.svg
+      - homepage.href=http://ufo:3002
+      - homepage.description=Twenty customer portal — pilot
+
+  db:
+    image: postgres:17-alpine
+    container_name: twenty-portal-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: ${PORTAL_DB_PASSWORD}
+      POSTGRES_DB: portal
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+networks:
+  ufo-net:
+    external: true

@@ -1,0 +1,68 @@
+# Gluetun — VPN client (WireGuard) with a built-in HTTP proxy other
+# devices/apps can use at ufo:8888. The WireGuard private key goes in this
+# stack's .env ON THE BOX ONLY — never in this repo.
+# Other stacks cannot be forced through Gluetun: an app must use the proxy
+# itself, or embed its own Gluetun sidecar.
+services:
+  vpn:
+    # VERIFY at deploy: confirm the current v3.x tag on Docker Hub.
+    image: qmcgaw/gluetun:v3.41.3
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "8888:8888" # HTTP proxy for LAN/tailnet clients
+    environment:
+      VPN_SERVICE_PROVIDER: ${VPN_SERVICE_PROVIDER:-custom}
+      VPN_TYPE: wireguard
+      WIREGUARD_PRIVATE_KEY: ${WIREGUARD_PRIVATE_KEY}
+      WIREGUARD_ADDRESSES: ${WIREGUARD_ADDRESSES}
+      # Used only with a named provider (VPN_SERVICE_PROVIDER != custom).
+      SERVER_COUNTRIES: ${SERVER_COUNTRIES:-}
+      HTTPPROXY: "on"
+      HTTPPROXY_LISTENING_ADDRESS: ":8888"
+      # Control server stays internal to this stack (not published).
+      CONTROL_SERVER_LISTENING_ADDRESS: ":8000"
+      TZ: America/New_York
+    labels:
+      - homepage.group=Infrastructure
+      - homepage.name=Gluetun
+      - homepage.icon=gluetun
+      - homepage.href=http://ufo:8010
+      - homepage.description=VPN + proxy :8888
+
+  # Tiny status page: how to check the tunnel is up (exit IP test).
+  web:
+    image: nginx:1.27-alpine
+    container_name: gluetun-web
+    restart: unless-stopped
+    ports:
+      - "8010:80"
+    command:
+      - sh
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'HTML'
+        <!doctype html>
+        <html><head><title>Gluetun VPN</title></head>
+        <body style="font-family:sans-serif;max-width:44em;margin:2em auto;padding:0 1em">
+        <h1>Gluetun VPN</h1>
+        <p>The VPN tunnel itself has no web UI. This page is a status and help placeholder.</p>
+        <h2>Check your exit IP (is the tunnel up?)</h2>
+        <pre>curl -x http://192.168.4.216:8888 https://ipinfo.io/ip</pre>
+        <p>Run that from any device on the LAN/Tailscale. The IP it prints is the
+        VPN exit IP. If it fails or shows the home IP, the tunnel is down
+        (check the vpn service logs).</p>
+        <h2>Who can use the tunnel</h2>
+        <p>Any app or device that supports an HTTP proxy can use
+        192.168.4.216:8888. Other stacks cannot be forced through it - they must
+        use the proxy themselves or embed their own Gluetun sidecar.</p>
+        <h2>Keys</h2>
+        <p>The WireGuard private key lives only on this machine (this stack's
+        .env file), never in the repo.</p>
+        </body></html>
+        HTML
+        exec nginx -g 'daemon off;'

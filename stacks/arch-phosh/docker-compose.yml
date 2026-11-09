@@ -1,0 +1,67 @@
+# Arch + Phosh — a phone-shaped Linux desktop in the browser.
+# NO custom image: the official Arch image installs the Phosh stack into
+# the container layer on first start (several minutes — watch the log).
+# The layer persists across restarts; a recreate repeats the one-time
+# install. PIN NOTE: archlinux publishes rolling tags only.
+services:
+  desktop:
+    image: archlinux:latest
+    container_name: arch-phosh-desktop
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+    volumes:
+      - ./data/home:/home/user
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -u
+        if [ ! -x /usr/bin/phosh ]; then
+          echo "[arch-phosh] first start: installing Phosh stack (several minutes)..."
+          pacman -Syu --noconfirm \
+            phosh phoc wayvnc squeekboard \
+            gnome-console gnome-text-editor epiphany \
+            xdg-desktop-portal xdg-desktop-portal-wlr \
+            pipewire wireplumber ttf-dejavu noto-fonts \
+            || { echo "FATAL: pacman install failed"; exit 1; }
+          id user >/dev/null 2>&1 || useradd -m -s /bin/bash user
+          echo "[arch-phosh] install complete"
+        fi
+        export HOME=/home/user
+        export XDG_RUNTIME_DIR=/tmp/xdg-runtime
+        mkdir -p "$$XDG_RUNTIME_DIR" && chmod 700 "$$XDG_RUNTIME_DIR"
+        export WLR_BACKENDS=headless
+        export WLR_LIBINPUT_NO_DEVICES=1
+        export LIBGL_ALWAYS_SOFTWARE=1
+        export WLR_RENDERER=pixman
+        runuser -u user -- env HOME=/home/user XDG_RUNTIME_DIR=$$XDG_RUNTIME_DIR \
+          WLR_BACKENDS=headless WLR_LIBINPUT_NO_DEVICES=1 \
+          LIBGL_ALWAYS_SOFTWARE=1 WLR_RENDERER=pixman \
+          bash -c '
+            phoc -C /usr/share/phosh/phoc.ini &
+            PHOC_PID=$$!
+            for i in $$(seq 1 30); do [ -S "$$XDG_RUNTIME_DIR/wayland-0" ] && break; sleep 1; done
+            export WAYLAND_DISPLAY=wayland-0
+            wayvnc --port=5900 0.0.0.0 &
+            wait -n $$PHOC_PID $$!
+          ' &
+        wait $$!
+
+  # noVNC front end — the desktop in a browser tab, touch-friendly.
+  web:
+    image: theasp/novnc:latest
+    container_name: arch-phosh-web
+    restart: unless-stopped
+    ports:
+      - "8015:8080"
+    environment:
+      VNC_SERVER: desktop:5900
+    depends_on:
+      - desktop
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Arch + Phosh
+      - homepage.icon=arch-phosh.svg
+      - homepage.href=http://ufo:8015
+      - homepage.description=Phone desktop in the browser

@@ -1,0 +1,64 @@
+# Goose (AAIF) — headless AI agent, EXPERIMENTAL.
+# Official image (GHCR only; verified 2026-11-09). Tag 1.43.0 is the
+# registry-confirmed pin; upstream releases move fast (v1.57.0 was the
+# latest release at check time) — bump deliberately.
+# SAFETY: Goose executes shell commands. It gets NO docker socket and NO
+# host mounts — its whole world is /workspace and its config dir. Its API
+# port is NOT published; reach it by exec-ing into the container or from
+# another stack on purpose, never from the network.
+services:
+  agent:
+    image: ghcr.io/aaif-goose/goose:1.43.0
+    container_name: goose-agent
+    restart: unless-stopped
+    working_dir: /workspace
+    environment:
+      # Local OpenAI-compatible model server (host Ollama by default).
+      GOOSE_PROVIDER: openai
+      OPENAI_HOST: "http://host.docker.internal:11434"
+      # Local endpoints ignore the key, but Goose requires one to exist.
+      OPENAI_API_KEY: "local"
+      GOOSE_MODEL: gpt-oss:20b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./data/workspace:/workspace
+      - ./data/config:/root/.config/goose
+    # VERIFY at deploy: the headless server subcommand ("goose serve") and
+    # that the image's entrypoint is the goose binary; if the image runs a
+    # shell instead, prefix with the binary path.
+    command: ["serve", "--host", "0.0.0.0", "--port", "3000"]
+
+  # Static help/status page (the agent itself stays unpublished).
+  web:
+    image: nginx:1.27-alpine
+    container_name: goose-web
+    restart: unless-stopped
+    ports:
+      - "8012:80"
+    command:
+      - sh
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'HTML'
+        <!doctype html>
+        <html><head><title>Goose (experimental)</title></head>
+        <body style="font-family:sans-serif;max-width:44em;margin:2em auto;padding:0 1em">
+        <h1>Goose - headless agent (EXPERIMENTAL)</h1>
+        <p>Goose has no web UI. This stack runs it headless, pointed at the
+        local models (OPENAI_HOST in the stack's docker-compose.yml).</p>
+        <h2>Talk to it</h2>
+        <p>Exec into the agent container and run goose commands in /workspace,
+        or use its API from inside the stack network (never published).</p>
+        <h2>Safety</h2>
+        <p>Goose executes shell commands in its workspace volume. It has no
+        Docker socket and no host access. Never publish its port.</p>
+        </body></html>
+        HTML
+        exec nginx -g 'daemon off;'
+    labels:
+      - homepage.group=AI
+      - homepage.name=Goose
+      - homepage.icon=goose.svg
+      - homepage.href=http://ufo:8012
+      - homepage.description=Headless agent (experimental)

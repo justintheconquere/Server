@@ -1,0 +1,31 @@
+# Chrome in a container (linuxserver, Selkies streaming) — a real browser
+# on the box, reachable from the phone. The /config volume holds the whole
+# profile (logins, cookies, Downloads): treat it as sensitive, back it up
+# via Backrest, never expose this beyond tailnet/LAN.
+services:
+  web:
+    # VERIFY at deploy: linuxserver publishes per-build tags like this one;
+    # confirm it exists on lscr.io, else pin the current build tag (or the
+    # chromium fallback image, same Selkies base and /config layout).
+    image: lscr.io/linuxserver/chrome:157.0.8103.38-1-ls138
+    container_name: chrome
+    restart: unless-stopped
+    ports:
+      - "3004:3000"
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/New_York
+    # Chrome's sandbox needs a large shared-memory segment or tabs crash.
+    shm_size: "2gb"
+    security_opt:
+      # Required by linuxserver's Chrome image to launch.
+      - seccomp=unconfined
+    volumes:
+      - ./config:/config
+    labels:
+      - homepage.group=Tools
+      - homepage.name=Chrome
+      - homepage.icon=chrome
+      - homepage.href=http://ufo:3004
+      - homepage.description=Browser on the box

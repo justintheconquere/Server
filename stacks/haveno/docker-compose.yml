@@ -1,0 +1,96 @@
+# Haveno client daemon (havenod) — headless, EXPERIMENTAL. Read README.md.
+# The daemon joins the Haveno P2P network over Tor and talks to the shared
+# monerod over ufo-net. No ports are published except the status page: P2P
+# rides Tor, and the gRPC API (9998) is exposed only inside ufo-net —
+# anyone who reaches it AND has the API password has full wallet control.
+services:
+  daemon:
+    # VERIFY — IMAGE (checked 2026-11-08, re-checked 2026-11-09): upstream
+    # haveno-dex publishes NO official container image, and the one
+    # published daemon image reference (Docker Hub havenodex/haveno-daemon,
+    # digest-pinned below) could NOT be confirmed on re-check — the org's
+    # verifiable image is a Monero node, not the daemon, and the 2024
+    # build was ARM64-only besides. Treat the pin below as a placeholder:
+    # expect a self-built amd64 image from github.com/haveno-dex/haveno
+    # (or the RetoSwap fork) before this can run.
+    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    container_name: haveno-daemon
+    restart: unless-stopped
+    environment:
+      HOME: "/haveno"
+    command:
+      - "--appDataDir=/haveno"
+      - "--appName=Haveno"
+      # RetoSwap's live network setting. Upstream haveno-dex builds default
+      # to stagenet and run no live mainnet network of their own — which
+      # network you join depends on the image/build. Confirm before funding.
+      - "--baseCurrencyNetwork=XMR_MAINNET"
+      - "--useDevPrivilegeKeys=false"
+      - "--useLocalhostForP2P=false"
+      # Shared node over the private network (not Tor): RPC login goes in
+      # the dedicated flags, NOT embedded in the URI.
+      - "--xmrNode=http://monerod:18081"
+      - "--xmrNodeUsername=${MONERO_RPC_USER}"
+      - "--xmrNodePassword=${MONERO_RPC_PASS}"
+      - "--useTorForXmr=off"
+      - "--nodePort=9999"
+      - "--apiPort=9998"
+      - "--apiBindAddress=0.0.0.0"
+      - "--apiPassword=${HAVENO_API_PASSWORD}"
+    expose:
+      - "9998"
+    volumes:
+      # Wallet, seed and account data — SENSITIVE, funds-critical.
+      - ./data/haveno:/haveno
+    networks:
+      - default
+      - ufo-net
+
+  # Static status page (the daemon has no web UI).
+  web:
+    image: nginx:alpine
+    container_name: haveno-web
+    restart: unless-stopped
+    ports:
+      - "8013:80"
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'EOF'
+        <!DOCTYPE html>
+        <html lang="en"><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Haveno (Daemon)</title>
+        <style>body{font-family:system-ui,sans-serif;max-width:44em;margin:2em auto;padding:0 1em;line-height:1.5}code{background:#eee;padding:.1em .3em;border-radius:3px}.warn{border:1px solid #c0392b;padding:.5em 1em;border-radius:6px}</style>
+        </head><body>
+        <h1>Haveno — client daemon (EXPERIMENTAL)</h1>
+        <p>Daemon-only, for install/uninstall testing. There is no trading
+        interface here: the daemon runs headless, joins the Haveno P2P network
+        over Tor, and talks to the shared Monero node on this box. Its gRPC
+        API (port 9998) is reachable only inside the internal network.</p>
+        <h2>Which network?</h2>
+        <p>Configured for <code>XMR_MAINNET</code> — the RetoSwap live
+        network's setting. Confirm which network the installed image actually
+        joins <em>before</em> funding anything.</p>
+        <div class="warn"><h2>Seed &amp; wallet backup — read this</h2>
+        <p>The stack's <code>data/haveno</code> folder holds the Haveno wallet
+        and its seed. <strong>Lose it and you lose access to funds in trades
+        and to the wallet balance.</strong> Back it up (encrypted, offline)
+        before updating, and write the seed down like any Monero seed.</p>
+        <p><strong>Before real funds:</strong> check current Haveno/RetoSwap
+        security advisories — exploits were reported in 2026. Start tiny.</p>
+        </div>
+        </body></html>
+        EOF
+        exec nginx -g 'daemon off;'
+    labels:
+      - homepage.group=Payments
+      - homepage.name=Haveno
+      - homepage.icon=haveno.svg
+      - homepage.href=http://ufo:8013
+      - homepage.description=DEX daemon (experimental)
+
+networks:
+  ufo-net:
+    external: true

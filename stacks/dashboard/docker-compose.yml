@@ -1,0 +1,22 @@
+# Homepage — the server's front page. Lightweight, configured entirely in
+# YAML: edit ./config/services.yaml to change tiles, drop icon files into
+# ./icons, restart the stack to apply.
+# Icons: a bare slug (e.g. "ollama") loads from the dashboard-icons set;
+# a filename (e.g. "twenty.svg") loads from ./icons (mounted into the app's
+# public icons folder).
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v2.7.0
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "3005:3000"
+    environment:
+      # Homepage v1+ refuses unknown Host headers. List every name/address
+      # the dashboard is opened by; extend if the hostname changes.
+      HOMEPAGE_ALLOWED_HOSTS: "localhost:3005,ufo:3005,192.168.4.216:3005,100.122.244.66:3005"
+    volumes:
+      - ./config:/app/config
+      - ./icons:/app/public/icons
+      # Read-only: container status + label discovery for the tiles.
+      - /var/run/docker.sock:/var/run/docker.sock:ro

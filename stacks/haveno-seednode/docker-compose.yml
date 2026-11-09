@@ -1,0 +1,108 @@
+# Haveno seed node — operator side, for Justin's OWN Haveno network
+# instance. EXPERIMENTAL, same image problem as stacks/haveno (see its
+# README): no official image exists; the pinned daemon image is ARM64-only,
+# so expect a self-built amd64 image before this can run.
+# A Haveno network is defined by its build (seed nodes, arbitrator, price
+# node baked into clients) — running this does NOT join RetoSwap.
+# The arbitrator is NOT a container: it is a role registered from a Haveno
+# client, manually, by Justin (see the status page text below).
+services:
+  seednode:
+    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    container_name: haveno-seednode
+    restart: unless-stopped
+    # VERIFY against the final image: the haveno-seednode launcher must
+    # exist on its PATH (Gradle builds generate it; main class
+    # haveno.seednode.SeedNodeMain).
+    entrypoint:
+      - "haveno-seednode"
+    environment:
+      HOME: "/seednode"
+    command:
+      - "--appDataDir=/seednode"
+      - "--appName=haveno-XMR_MAINNET_Seed_2002"
+      - "--baseCurrencyNetwork=XMR_MAINNET"
+      # P2P port — reached by clients via the seed node's own Tor hidden
+      # service; never published to the host.
+      - "--nodePort=2002"
+      - "--xmrNode=http://monerod:18081"
+      - "--xmrNodeUsername=${MONERO_RPC_USER}"
+      - "--xmrNodePassword=${MONERO_RPC_PASS}"
+      - "--useTorForXmr=off"
+    volumes:
+      # Seed node identity: Tor hidden-service keys + network data. Losing
+      # this changes the seed node's onion address — back it up.
+      - ./data/seednode:/seednode
+    networks:
+      - default
+      - ufo-net
+
+  # Price node — DISABLED PLACEHOLDER, intentionally not faked.
+  # Upstream's price node is a separate application; no usable image exists
+  # (havenodex/haveno-pricenode has zero published tags). Parked behind the
+  # "disabled" profile. When a real image is built and pinned, remove the
+  # profile and re-verify the flags.
+  pricenode:
+    profiles: ["disabled"]
+    image: havenodex/haveno-daemon:latest@sha256:8f8b5ca7e8f921d1e88b492cd4b79bf6795f5a89c663c8697b542bf2ed1fef3c
+    container_name: haveno-pricenode
+    restart: unless-stopped
+    environment:
+      HOME: "/pricenode"
+    volumes:
+      - ./data/pricenode:/pricenode
+    networks:
+      - default
+      - ufo-net
+
+  # Static status page.
+  web:
+    image: nginx:alpine
+    container_name: haveno-seednode-web
+    restart: unless-stopped
+    ports:
+      - "8014:80"
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'EOF'
+        <!DOCTYPE html>
+        <html lang="en"><head><meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Haveno Seed Node</title>
+        <style>body{font-family:system-ui,sans-serif;max-width:44em;margin:2em auto;padding:0 1em;line-height:1.5}code{background:#eee;padding:.1em .3em;border-radius:3px}.warn{border:1px solid #c0392b;padding:.5em 1em;border-radius:6px}</style>
+        </head><body>
+        <h1>Haveno seed node (EXPERIMENTAL)</h1>
+        <p>The bootstrap backbone of <strong>your own</strong> Haveno network:
+        clients reach it over Tor to discover peers, fetch the offer board,
+        and learn trade fees and the arbitrator list. It publishes no ports —
+        P2P rides its Tor hidden service. Running it does <em>not</em> join
+        or support the live RetoSwap network.</p>
+        <h2>Price node: disabled</h2>
+        <p>Ships disabled on purpose: no verifiable container image for
+        upstream's price node exists yet. It is a marked placeholder, not a
+        fake.</p>
+        <div class="warn"><h2>Arbitrator is not an app</h2>
+        <p>An arbitrator is a <strong>role registered from a Haveno
+        client</strong>, not a server: use a dedicated wallet in the client,
+        fund it, register it for your network with the arbitrator privilege
+        key — manually, understanding that the key settles disputes and can
+        move escrowed funds. That step is Justin's alone.</p>
+        <p>The seed node's <code>data/seednode</code> folder holds its Tor
+        identity — back it up before updating, or its onion address changes
+        and every configured client breaks.</p>
+        </div>
+        </body></html>
+        EOF
+        exec nginx -g 'daemon off;'
+    labels:
+      - homepage.group=Payments
+      - homepage.name=Haveno Seed Node
+      - homepage.icon=haveno.svg
+      - homepage.href=http://ufo:8014
+      - homepage.description=Own-network seed node (experimental)
+
+networks:
+  ufo-net:
+    external: true

@@ -1,0 +1,80 @@
+# BTCPay Server — Monero ONLY (no bitcoind, no NBXplorer).
+# The marketplace engine for Voodoo Bazaar: the Monero plugin set lives in
+# the data volume's Plugins folder and persists across updates.
+# Public face: https://pay.voodoobazaar.com via the cloudflared stack.
+# No reverse-proxy auth in front — BTCPay has its own auth, and anything
+# else in front breaks buyers, webhooks and wallet callbacks.
+# The daemon is the shared monerod stack, reached over ufo-net as
+# monerod:18081 with its RPC login. Wallet RPC (18082) exists only inside
+# this stack's network — published nowhere.
+services:
+  server:
+    image: btcpayserver/btcpayserver:2.4.7
+    container_name: btcpay-server
+    restart: unless-stopped
+    depends_on:
+      - db
+      - wallet
+    ports:
+      - "23000:8080"
+    environment:
+      BTCPAY_POSTGRES: "Host=db;Database=btcpay;Username=btcpay;Password=${PG_PASSWORD}"
+      BTCPAY_NETWORK: mainnet
+      BTCPAY_HOST: https://pay.voodoobazaar.com
+      # When the BTCPay .onion exists, add it:
+      # BTCPAY_ADDITIONALHOSTS: "http://<onion>"
+      BTCPAY_XMR_DAEMON_URI: http://monerod:18081
+      BTCPAY_XMR_WALLET_DAEMON_URI: http://wallet:18082
+      BTCPAY_XMR_WALLET_DAEMON_WALLETDIR: /walletdata
+    volumes:
+      # BTCPay data dir — the Plugins folder lives under here.
+      - ./data/server:/datadir
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=Payments
+      - homepage.name=BTCPay (Monero)
+      - homepage.icon=btcpay-server
+      - homepage.href=https://pay.voodoobazaar.com
+      - homepage.description=Voodoo Bazaar payments
+
+  db:
+    image: postgres:16-alpine
+    container_name: btcpay-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: btcpay
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: btcpay
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+  wallet:
+    # Carries monero-wallet-rpc plus the tx-notify callback scripts the
+    # BTCPay Monero plugin relies on. Tag verified 2026-11-09
+    # (btcpayserver/monero uses bare Monero versions, no v prefix).
+    # VERIFY at deploy: the callback path (/monero/on-new-tx.sh per the
+    # plugin docs).
+    image: btcpayserver/monero:0.18.5.4
+    container_name: btcpay-wallet
+    restart: unless-stopped
+    command: >-
+      monero-wallet-rpc
+      --daemon-address=monerod:18081
+      --daemon-login=${MONERO_RPC_USER}:${MONERO_RPC_PASS}
+      --rpc-bind-ip=0.0.0.0
+      --rpc-bind-port=18082
+      --confirm-external-bind
+      --wallet-dir=/walletdata
+      --tx-notify=/monero/on-new-tx.sh %s
+      --log-file=/walletdata/wallet.log
+    volumes:
+      - ./data/wallet:/walletdata
+    networks:
+      - default
+      - ufo-net
+
+networks:
+  ufo-net:
+    external: true

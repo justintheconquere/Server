@@ -1,0 +1,5 @@
+# Homepage's Docker connection: the host socket (mounted read-only).
+# Gives every tile its container status, and discovers any container that
+# carries homepage.* labels (all stacks in this repo do).
+ufo:
+  socket: /var/run/docker.sock

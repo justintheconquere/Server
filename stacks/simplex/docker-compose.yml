@@ -1,0 +1,113 @@
+# SimpleX servers — private SMP (message) + XFTP (file) relays.
+# The certificates/keys generated on first start ARE the servers' identity
+# and address: back up ./data (it is in the Backrest scope) or the addresses
+# change for every client.
+# READ README.md in this folder BEFORE first start: the public address
+# (SIMPLEX_ADDR) is baked into the certificates at init time.
+services:
+  smp:
+    # VERIFY at deploy: pin the current v6.x tag (simplexchat/smp-server)
+    # and the -init flag syntax in the v6 docs.
+    image: simplexchat/smp-server:v7.0.1
+    container_name: simplex-smp
+    restart: unless-stopped
+    environment:
+      ADDR: ${SIMPLEX_ADDR}
+    command:
+      - sh
+      - -c
+      - |
+        if [ ! -f /etc/opt/simplex/smp-server.ini ]; then
+          smp-server -init -ip "$$ADDR";
+          echo "First start: set the server password in smp-server.ini";
+          echo "(key: password, [AUTH] section) to keep this a private relay.";
+        fi
+        exec smp-server
+    ports:
+      - "5223:5223"
+    volumes:
+      - ./data/smp/config:/etc/opt/simplex
+      - ./data/smp/logs:/var/opt/simplex
+
+  xftp:
+    # VERIFY at deploy: same v6.x pin as smp-server.
+    image: simplexchat/xftp-server:v7.0.1
+    container_name: simplex-xftp
+    restart: unless-stopped
+    environment:
+      ADDR: ${SIMPLEX_ADDR}
+    command:
+      - sh
+      - -c
+      - |
+        if [ ! -f /etc/opt/simplex-xftp/xftp-server.ini ]; then
+          xftp-server -init -ip "$$ADDR";
+        fi
+        exec xftp-server
+    ports:
+      - "443:443"
+    volumes:
+      - ./data/xftp/config:/etc/opt/simplex-xftp
+      - ./data/xftp/files:/srv/xftp
+      - ./data/xftp/logs:/var/opt/simplex-xftp
+
+  # Tor sidecar — gives the SMP server an .onion address. The key in
+  # ./data/tor IS the address; back it up.
+  tor:
+    image: ghcr.io/getumbrel/tor:0.4.9.11
+    container_name: simplex-tor
+    restart: unless-stopped
+    user: "1000:1000"
+    environment:
+      HOME: "/tmp"
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /data/hs-smp
+        printf 'SocksPort 0\nHiddenServiceDir /data/hs-smp\nHiddenServicePort 5223 smp:5223\n' > /tmp/torrc
+        exec tor -f /tmp/torrc
+    volumes:
+      - ./data/tor:/data
+    depends_on:
+      - smp
+
+  # Static help page (the servers themselves have no web UI).
+  web:
+    image: nginx:1.27-alpine
+    container_name: simplex-web
+    restart: unless-stopped
+    ports:
+      - "5225:80"
+    command:
+      - sh
+      - -c
+      - |
+        cat > /usr/share/nginx/html/index.html <<'HTML'
+        <!doctype html>
+        <html><head><title>SimpleX Server</title></head>
+        <body style="font-family:sans-serif;max-width:44em;margin:2em auto;padding:0 1em">
+        <h1>SimpleX Server (SMP + XFTP)</h1>
+        <p>Your private SimpleX relay is running. The servers have no web UI -
+        this page only explains how to use them.</p>
+        <h2>Add the servers in SimpleX Chat</h2>
+        <p>Read the server addresses (smp://fingerprint@host and
+        xftp://fingerprint@host) from the first-start logs or the .ini files in
+        this stack's data folder. In SimpleX Chat: Settings, Network &amp;
+        servers, add both addresses (clearnet and/or the .onion from
+        data/tor/hs-smp/hostname).</p>
+        <h2>Identity = data</h2>
+        <p>The certificates and keys in this stack's data folder are the
+        servers' identity. Back them up - lose them and the address changes.</p>
+        <h2>Private relay</h2>
+        <p>The SMP server is password-protected (set in smp-server.ini after
+        first start). Only clients that know the password can use it.</p>
+        </body></html>
+        HTML
+        exec nginx -g 'daemon off;'
+    labels:
+      - homepage.group=Comms
+      - homepage.name=SimpleX Server
+      - homepage.icon=simplex-chat
+      - homepage.href=http://ufo:5225
+      - homepage.description=Private SMP + XFTP relays
