@@ -136,8 +136,13 @@ one folder per stack with `docker-compose.yml` + `.env.example`.
      stack RPC login; wallet creation/seed is Justin's first-run step.
      Wallet files under the stack's `data/wallet/` (gitignored, like all
      `data/`).
-5. **Ollama** — official `ollama/ollama`, `--gpus=all`, models re-pulled:
-   gpt-oss:120b, gpt-oss:20b, llama3.1:70b, qwen3.5:35b, qwen3.8.
+5. **Ollama — NATIVE host install, no container** (Justin's call,
+   2026-11-09): the official install script plus a systemd override
+   (`OLLAMA_HOST=0.0.0.0:11434`) so containers reach it via
+   `host.docker.internal:11434` — one less GPU-passthrough layer on the
+   5090, and no NVIDIA container toolkit needed anywhere in the build.
+   Models re-pulled: gpt-oss:120b, gpt-oss:20b, llama3.1:70b,
+   qwen3.5:35b, qwen3.8.
    - GATE 5 (mirrors the Nov 6 proof): `ollama ps` shows the model **100% in
      VRAM**; a warm qwen3.8 run should be in the ~140 tok/s class. If it
      loads on CPU, stop — that's the driver failure mode, not an Ollama bug.
@@ -185,6 +190,24 @@ hostnames become plain compose service names:
   the host, password-gated via stack `.env`, **tailnet-only**. The stack
   README carries the safety rules (incl. never sharing its startup log —
   ttyd prints the credential there, base64-encoded).
+- **Agent layer** (added 2026-11-09; roles decided by Justin: Goose =
+  development, n8n = business-operations plumbing, Hermes = the
+  chief-of-staff agent): **n8n** runs the deterministic AssureBay flows
+  (lead intake, renewals, booking follow-ups, digests) with AI steps as
+  nodes and built-in approval steps gating anything customer-facing;
+  **Hermes** (Nous Research; dashboard :9119, gateway API :8642,
+  tailnet-only, no Docker socket by default) holds memory and judgment
+  and feeds n8n. **Paperclip** (agent-org orchestration) is deferred —
+  it has no model settings of its own (the Ollama URL lives in the
+  enrolled runtime, which is why Justin found no URL field for it on
+  Umbrel; native Ollama support is an open upstream feature request).
+  It earns its place once several persistent agents need budgets and
+  governance, and it can hire Hermes through its Hermes Gateway
+  adapter.
+- **Gitea** (the box's own git home: local mirror of this repo plus
+  private script/config repos) and **Toolbox** (a raw scripts + cron
+  container for machine-level jobs; Docker socket mounted deliberately,
+  no published ports).
 
 ## Dashboard (front page) — DECIDED 2026-11-09: Homepage
 **Homepage** (gethomepage/homepage): lightweight, configured entirely in YAML
@@ -201,8 +224,9 @@ deployment instructions and documentation. Proposed layout as stacks land:
 ```
 README.md            # rebuild runbook: this plan, condensed
 stacks/
-  arcane/  poznote/  cloudflared/  monerod/  ollama/
-  twenty/  btcpay/   bitcart/      backrest/ dashboard/ …
+  arcane/  poznote/  cloudflared/  monerod/  n8n/  hermes/
+  twenty/  btcpay/   bitcart/      backrest/ dashboard/ gitea/ toolbox/ …
+  (Ollama is a native host install — no stack folder.)
   (each: docker-compose.yml, .env.example, README notes)
 docs/                # decisions, port map, address book (IPs, onions, URLs)
 ```

@@ -1,0 +1,60 @@
+# Hermes Agent (Nous Research) — chief-of-staff agent for the business.
+# Official image (Docker Hub), pinned to the current stable release
+# (v0.23.0, 2026-11-05; tag verified on the registry 2026-11-09).
+# Docs: https://hermes-agent.nousresearch.com/docs/user-guide/docker
+#
+# Role split (decided 2026-11-09): Goose = development, n8n = ops
+# plumbing, Hermes = the agent with memory that triages, drafts, and
+# remembers. Hermes hands repeatable work to n8n; customer-facing sends
+# stay behind approval steps there (and Justin's standing rule).
+#
+# FIRST RUN IS THE SETUP WIZARD, not `up` — see README.md in this folder.
+# The wizard writes Hermes' own provider keys into ./data/.env; this
+# stack's .env only holds the gateway API key + dashboard login below.
+#
+# SECURITY SHAPE (read before changing):
+# - Gateway API (8642) is an OpenAI-compatible API keyed by API_SERVER_KEY.
+#   Anything that can reach the port AND has the key can drive the agent.
+#   Tailnet/LAN only — never tunnel it, never forward it.
+# - Dashboard (9119) requires basic auth from .env — Hermes refuses to
+#   serve it unauthenticated on a non-loopback bind (fails closed).
+# - NO docker socket. Hermes' terminal runs inside this container; its
+#   Docker execution backend stays off. Mounting the socket later is a
+#   deliberate, separate decision (it is host-root-equivalent).
+# - Local models: Ollama runs NATIVELY on the host (no container). In the
+#   wizard/config, the endpoint is http://host.docker.internal:11434/v1.
+services:
+  hermes:
+    image: nousresearch/hermes-agent:v0.23.0
+    container_name: hermes
+    restart: unless-stopped
+    command: ["gateway", "run"]
+    environment:
+      API_SERVER_ENABLED: "true"
+      API_SERVER_HOST: "0.0.0.0"
+      API_SERVER_KEY: ${API_SERVER_KEY:?set API_SERVER_KEY in .env}
+      API_SERVER_CORS_ORIGINS: "*"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: ${DASHBOARD_USER:-justin}
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: ${DASHBOARD_PASSWORD:?set DASHBOARD_PASSWORD in .env}
+      HERMES_DASHBOARD_BASIC_AUTH_SECRET: ${DASHBOARD_SECRET:?set DASHBOARD_SECRET in .env}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8642:8642"
+      - "9119:9119"
+    volumes:
+      - ./data:/opt/data
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=AI
+      - homepage.name=Hermes
+      - homepage.icon=hermes
+      - homepage.href=http://ufo:9119
+      - homepage.description=Chief-of-staff agent (dashboard)
+
+networks:
+  ufo-net:
+    external: true

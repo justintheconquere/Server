@@ -1,0 +1,9 @@
+# Toolbox crontab — one line per job. Times are America/New_York
+# (TZ is set in docker-compose.yml). Scripts live in ./scripts on the
+# host (mounted at /scripts) and must be executable (chmod +x).
+# The ">> /proc/1/fd/1 2>&1" tail sends job output to the container
+# log — read it with: docker logs toolbox
+# After editing this file: docker compose restart toolbox
+#
+# Example (commented out): health check every 6 hours
+# 0 */6 * * * /scripts/example-health.sh >> /proc/1/fd/1 2>&1

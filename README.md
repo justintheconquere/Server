@@ -44,19 +44,23 @@ stacks/
   poznote/           # notes app + MCP server
   cloudflared/       # Cloudflare Tunnel connector
   monerod/           # Monero node (+ tor sidecar, GUI wallet)
-  ollama/            # LLM runtime (GPU)
   twenty/            # Twenty CRM
+  n8n/               # workflow automation (ops engine)
+  hermes/            # chief-of-staff agent
+  gitea/             # self-hosted Git
+  toolbox/           # raw scripts + cron runner
   btcpay/            # BTCPay Server, Monero-only
   bitcart/           # Bitcart (side-by-side test)
   backrest/          # backups to external USB
-  dashboard/         # front-page dashboard (Homarr or Homepage — see PLAN.md)
+  dashboard/         # front-page dashboard (Homepage)
   …                  # chrome, gluetun, simplex, conduit, strfry, goose,
                      # haveno, haveno-seednode, arch-phosh
 docs/                # port map, address book, decisions log
 ```
 
 Each stack folder holds `docker-compose.yml`, `.env.example`, and a short
-`README.md` with anything stack-specific.
+`README.md` with anything stack-specific. Ollama is the one exception to
+the layout: it's a native host install (Stage 9), not a stack.
 
 ---
 
@@ -101,7 +105,7 @@ sudo dpkg-reconfigure -plow unattended-upgrades
 **Gate 1:** the box boots clean, answers on 192.168.4.216, and SSH on the LAN
 works.
 
-## Stage 2 — NVIDIA driver, Docker, container toolkit
+## Stage 2 — NVIDIA driver and Docker
 
 The RTX 5090 is Blackwell: NVIDIA **requires the open kernel modules** for
 this card; the proprietary modules are unsupported. Ubuntu's automatic driver
@@ -126,21 +130,17 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo usermod -aG docker $USER
 ```
 
-NVIDIA container toolkit (follow
-<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>
-— add NVIDIA's `libnvidia-container` apt repo and key, then):
+The NVIDIA container toolkit is deliberately **not** installed: no stack
+runs GPU workloads in a container (Ollama is a native host install,
+Stage 9), so the toolkit would be one more moving part for nothing. If a
+GPU container is ever added, install it then
+(<https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html>)
+and use a `--gpus all` test container as that stack's gate.
 
-```
-sudo apt-get install -y nvidia-container-toolkit
-sudo nvidia-ctk runtime configure --runtime=docker
-sudo systemctl restart docker
-docker run --rm --gpus all nvidia/cuda:13.0-base-ubuntu24.04 nvidia-smi
-```
-
-**Gate 2:** the test container's `nvidia-smi` shows the 5090. *This is the
-gate that matters.* On the old system an outdated driver made every AI app
-silently fall back to CPU — nothing AI-related gets installed until this
-passes.
+**Gate 2:** `nvidia-smi` on the host lists the RTX 5090 on the 580-open
+driver. On the old system an outdated driver made every AI app silently
+fall back to CPU — the full end-to-end GPU proof is Gate 5 at Stage 9,
+and nothing AI-related gets installed until both pass.
 
 ## Stage 3 — Tailscale and SSH
 
@@ -270,10 +270,32 @@ GUI wallet (v0.18.5.4, hash-verified) into a Webtop browser desktop at
 choose Advanced mode, then Settings → Node → Remote node `monerod:18081`
 with the stack's RPC login. Full steps in `stacks/monerod/README.md`.
 
-## Stage 9 — Ollama (GPU)
+## Stage 9 — Ollama (GPU, native install)
+
+Ollama runs directly on the host — **no container** (Justin's call,
+2026-11-09). One less GPU-passthrough layer between the models and the
+5090, and `ollama ps` tells the truth about the GPU directly.
 
 ```
-cd ~/server-config/stacks/ollama && docker compose up -d
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+By default Ollama listens only on 127.0.0.1, which the containers can't
+reach. Open it to the box's own interfaces so stacks reach it through
+`host.docker.internal:11434` (Goose and Hermes are already pointed
+there):
+
+```
+sudo systemctl edit ollama
+# in the editor, add:
+[Service]
+Environment="OLLAMA_HOST=0.0.0.0:11434"
+sudo systemctl restart ollama
+```
+
+Tailnet/LAN only — never port-forward 11434.
+
+```
 ollama pull gpt-oss:120b
 ollama pull gpt-oss:20b
 ollama pull llama3.1:70b
@@ -323,11 +345,26 @@ Deploy from their stack folders (or Arcane) as wanted:
   (`stacks/dashboard`), then it answers at `ufo:3005`, tailnet/LAN only.
   Apps appear via the entries in `services.yaml` (one per app, each with its
   icon) plus Docker label auto-discovery.
+- **n8n (ops engine)** — AssureBay workflow automation: lead intake,
+  renewal reminders, booking follow-ups, digests. Postgres-backed;
+  `N8N_ENCRYPTION_KEY` in its `.env` encrypts all stored credentials —
+  set it once, never change it. First run: create the owner account
+  immediately. Customer-facing steps go through approval steps; public
+  webhooks stay off unless a tunnel route is deliberately added later.
+- **Hermes (chief-of-staff agent)** — run the setup wizard first
+  (`docker compose run --rm hermes setup`; local models = the host
+  Ollama at `http://host.docker.internal:11434/v1`), then
+  `docker compose up -d`. Dashboard `ufo:9119` (basic auth from its
+  `.env`), gateway API `ufo:8642` (key in `.env`) — tailnet only, no
+  Docker socket. See `stacks/hermes/README.md`.
 - **Bitcart, Chrome, Gluetun, SimpleX, Conduit, strfry, Goose, Haveno,
-  Haveno seednode, Arch + Phosh, ttyd (web terminal)** — per their stack
-  folders. SimpleX and strfry identity keys are part of the Backrest
-  scope from first start. ttyd is a password-gated root shell in a
-  browser tab (`ufo:7681`) — tailnet only, see `stacks/ttyd/README.md`.
+  Haveno seednode, Arch + Phosh, ttyd (web terminal), Gitea, Toolbox** —
+  per their stack folders. SimpleX and strfry identity keys are part of
+  the Backrest scope from first start. ttyd is a password-gated root
+  shell in a browser tab (`ufo:7681`) — tailnet only, see
+  `stacks/ttyd/README.md`. Gitea is the box's own git home (`ufo:3007`);
+  Toolbox is the raw scripts + cron runner (no ports, Docker socket
+  mounted on purpose — see `stacks/toolbox/README.md`).
 
 ---
 
@@ -343,7 +380,11 @@ Deploy from their stack folders (or Arcane) as wanted:
 | Twenty | `ufo:3000` | tailnet only |
 | Poznote | `ufo:8040` | tailnet/LAN |
 | Poznote MCP | `ufo:8045` | tailnet/LAN, token-auth |
-| Ollama API | `ufo:11434` | tailnet/LAN |
+| n8n | `ufo:5678` | tailnet/LAN |
+| Hermes dashboard | `ufo:9119` | tailnet/LAN, basic auth |
+| Hermes gateway API | `ufo:8642` | tailnet/LAN, key required |
+| Gitea | `ufo:3007` (git SSH `ufo:2222`) | tailnet/LAN |
+| Ollama API (native install) | `ufo:11434` | tailnet/LAN |
 | Monero GUI wallet | `ufo:3006` | **tailnet only** — holds keys |
 | monerod RPC | `ufo:18081` (login required) | LAN/tailnet |
 | monerod restricted RPC | `ufo:18089` | LAN/tailnet |

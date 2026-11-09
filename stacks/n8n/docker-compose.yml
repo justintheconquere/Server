@@ -1,0 +1,67 @@
+# n8n — workflow automation: AssureBay's ops engine.
+# Official image, pinned (2.43.5 verified on Docker Hub 2026-11-09).
+#
+# Role: the deterministic business flows live here — lead intake, renewal
+# reminders, booking follow-ups, daily digests. AI steps and approval steps
+# are nodes inside the flows. Anything customer-facing goes through an
+# approval step: nothing sends on its own. (Hermes drafts and triages;
+# n8n executes the repeatable flows.)
+#
+# First run: open http://ufo:5678 and create the owner account immediately —
+# the first account created owns the instance.
+#
+# Public webhooks are NOT exposed by default. Triggers run on the tailnet
+# (schedules, polling, internal webhooks). A public webhook route through
+# the Cloudflare tunnel is a separate, deliberate decision — do not add one
+# casually.
+services:
+  n8n:
+    image: n8nio/n8n:2.43.5
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_HOST: db
+      DB_POSTGRESDB_PORT: "5432"
+      DB_POSTGRESDB_DATABASE: n8n
+      DB_POSTGRESDB_USER: n8n
+      DB_POSTGRESDB_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      # Encrypts every credential n8n stores. Set once in .env, never
+      # change it — changing or losing it makes all stored credentials
+      # unreadable.
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?set N8N_ENCRYPTION_KEY in .env}
+      N8N_HOST: ufo
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://ufo:5678/
+      GENERIC_TIMEZONE: America/New_York
+      TZ: America/New_York
+    ports:
+      - "5678:5678"
+    volumes:
+      - ./data:/home/node/.n8n
+    depends_on:
+      - db
+    networks:
+      - default
+      - ufo-net
+    labels:
+      - homepage.group=Business
+      - homepage.name=n8n
+      - homepage.icon=n8n
+      - homepage.href=http://ufo:5678
+      - homepage.description=Workflow automation — ops engine
+
+  db:
+    image: postgres:16-alpine
+    container_name: n8n-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: n8n
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: n8n
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+
+networks:
+  ufo-net:
+    external: true

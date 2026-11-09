@@ -13,6 +13,8 @@ internet by design.
 | 3004 | Chrome (browser UI) | chrome | tailnet/LAN |
 | 3005 | Homepage dashboard | dashboard | tailnet/LAN |
 | 3006 | Monero GUI wallet (Webtop desktop) | monerod | **tailnet only** — holds keys |
+| 3007 | Gitea web UI | gitea | tailnet/LAN |
+| 2222 | Gitea git SSH | gitea | tailnet/LAN |
 | 3552 | Arcane | arcane | tailnet/LAN |
 | 5223 | SimpleX SMP | simplex | public (by design) |
 | 443 | SimpleX XFTP | simplex | public (by design) |
@@ -29,13 +31,17 @@ internet by design.
 | 8045 | Poznote MCP server | poznote | tailnet/LAN, token-auth |
 | 8888 | Gluetun HTTP proxy | gluetun | tailnet/LAN |
 | 9898 | Backrest | backrest | tailnet/LAN |
-| 11434 | Ollama API | ollama | tailnet/LAN |
+| 11434 | Ollama API | — (native host install, no container) | tailnet/LAN |
+| 5678 | n8n (workflow automation) | n8n | tailnet/LAN |
+| 8642 | Hermes gateway API (key required) | hermes | tailnet/LAN |
+| 9119 | Hermes dashboard (basic auth) | hermes | tailnet/LAN |
 | 18080 | monerod P2P | monerod | public (by design) |
 | 18081 | monerod RPC (login required) | monerod | LAN/tailnet |
 | 18083 | monerod ZMQ pub | monerod | LAN/tailnet (P2Pool) |
 | 18089 | monerod restricted RPC | monerod | LAN/tailnet |
 | 23000 | BTCPay Server | btcpay | tailnet/LAN (public face = pay.voodoobazaar.com via tunnel) |
 | 9090 | Cockpit (host package, not Docker) | — | tailnet/LAN |
+| — | Toolbox (scripts + cron) | toolbox | no published ports |
 
 Web UI on 8040; the MCP
 server on 8045 is the integration point Muse uses (Bearer token).

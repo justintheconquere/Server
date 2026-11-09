@@ -12,6 +12,12 @@
         description: Docker management
         server: ufo
         container: arcane
+    - Gitea:
+        icon: gitea
+        href: http://ufo:3007
+        description: Self-hosted Git — local repo home
+        server: ufo
+        container: gitea
     - Web Terminal:
         icon: ttyd.svg
         href: http://ufo:7681
@@ -46,6 +52,12 @@
         description: Plans and notes
         server: ufo
         container: poznote
+    - n8n:
+        icon: n8n
+        href: http://ufo:5678
+        description: Workflow automation — ops engine
+        server: ufo
+        container: n8n
     - Client Portal (pilot):
         icon: twenty.svg
         href: http://ufo:3002
@@ -57,9 +69,13 @@
     - Ollama:
         icon: ollama
         href: http://ufo:11434
-        description: LLM runtime (API)
+        description: LLM runtime — native install (API)
+    - Hermes:
+        icon: hermes
+        href: http://ufo:9119
+        description: Chief-of-staff agent (dashboard)
         server: ufo
-        container: ollama
+        container: hermes
     - Goose:
         icon: goose.svg
         href: http://ufo:8012

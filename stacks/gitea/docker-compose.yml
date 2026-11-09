@@ -1,0 +1,37 @@
+# Gitea — self-hosted Git on ufo.
+# Official image, pinned (28.3.0, updated 2026-11-01 — Gitea moved from
+# 1.x to 28.x versioning in Sept 2026; tag verified on Docker Hub
+# 2026-11-09).
+#
+# Why here: the box's own git home — a local mirror of this config repo
+# and a private home for scripts and configs that shouldn't live on
+# GitHub. GitHub stays the off-site copy; Gitea is the local one.
+#
+# Single-user shape: SQLite inside ./data (officially supported at this
+# scale), so the whole instance backs up as one folder via Backrest.
+#
+# First run: open http://ufo:3007, complete the installer, and create the
+# admin account. Registration is disabled below — it's a one-person box.
+services:
+  gitea:
+    image: gitea/gitea:28.3.0
+    container_name: gitea
+    restart: unless-stopped
+    environment:
+      USER_UID: "1000"
+      USER_GID: "1000"
+      GITEA__server__DOMAIN: ufo
+      GITEA__server__ROOT_URL: http://ufo:3007/
+      GITEA__server__SSH_PORT: "2222"
+      GITEA__service__DISABLE_REGISTRATION: "true"
+    ports:
+      - "3007:3000"
+      - "2222:22"
+    volumes:
+      - ./data:/data
+    labels:
+      - homepage.group=Management
+      - homepage.name=Gitea
+      - homepage.icon=gitea
+      - homepage.href=http://ufo:3007
+      - homepage.description=Self-hosted Git — local repo home

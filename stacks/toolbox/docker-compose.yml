@@ -1,0 +1,27 @@
+# Toolbox — raw scripts + cron jobs for the box itself.
+# No published ports, no UI. It runs the scripts in ./scripts on the
+# schedule in ./crontab, and you can exec in any time:
+#   docker exec -it toolbox bash
+# Scheduled *business workflows* belong in n8n — this box is for raw
+# shell/python jobs that touch the machine (health checks, cleanup,
+# stack babysitting, report generation).
+#
+# SAFETY: the Docker socket is mounted so scripts can manage the
+# stacks — socket access is root-equivalent on the host. The
+# container's protection is that it exposes nothing to any network and
+# only ever runs scripts you put in ./scripts yourself. Treat that
+# folder like root's crontab, because that's what it is.
+services:
+  toolbox:
+    build: .
+    container_name: toolbox
+    restart: unless-stopped
+    environment:
+      TZ: America/New_York
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./scripts:/scripts
+      - ./crontab:/config/crontab:ro
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
