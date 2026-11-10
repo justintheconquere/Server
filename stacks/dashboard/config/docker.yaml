@@ -1,5 +1,7 @@
-# Homepage's Docker connection: the host socket (mounted read-only).
-# Gives every tile its container status, and discovers any container that
-# carries homepage.* labels (all stacks in this repo do).
-ufo:
-  socket: /var/run/docker.sock
+# No Docker servers defined on purpose: services.yaml is the single
+# source of truth for tiles. Defining the host socket here made Homepage
+# ALSO auto-discover every container carrying homepage.* labels, which
+# duplicated every deployed stack's tile (verified live 2026-11-10:
+# 53 tiles rendered, 7 of them duplicated). If you ever want label
+# discovery instead, define the server here and delete the matching
+# entries from services.yaml — never run both.

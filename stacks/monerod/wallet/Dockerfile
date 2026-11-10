@@ -14,7 +14,10 @@ FROM lscr.io/linuxserver/webtop:ubuntu-xfce
 ARG MONERO_GUI_VERSION=0.18.5.4
 ARG MONERO_GUI_SHA256=44cd148993ebd4ca63d7a191244eef7e2a783225cbaa0e5edd475ca34abd5874
 
-RUN curl -fsSL -o /tmp/monero-gui.tar.bz2 \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bzip2 \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL -o /tmp/monero-gui.tar.bz2 \
       "https://downloads.getmonero.org/gui/monero-gui-linux-x64-v${MONERO_GUI_VERSION}.tar.bz2" \
     && echo "${MONERO_GUI_SHA256}  /tmp/monero-gui.tar.bz2" | sha256sum -c - \
     && tar -xjf /tmp/monero-gui.tar.bz2 -C /opt \
