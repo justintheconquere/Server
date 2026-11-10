@@ -76,6 +76,12 @@
         description: Document archive (OCR + search)
         server: ufo
         container: paperless
+    - Medusa:
+        icon: medusa
+        href: http://ufo:9000/app
+        description: Self-hosted store — backend + admin
+        server: ufo
+        container: medusa-server
     - Client Portal (pilot):
         icon: twenty.svg
         href: http://ufo:3002

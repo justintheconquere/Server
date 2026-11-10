@@ -249,6 +249,17 @@ hostnames become plain compose service names:
   service from simplex-chat v7.1.2, source-built — the longest
   build in the store), configured on first run with his SMP server;
   runs alongside the official directory, not instead of it.
+- **Medusa store** (added 2026-11-09, Justin's pick for a SEPARATE
+  store project — explicitly not Voodoo Bazaar): the self-hosted
+  Shopify alternative, chosen on his three criteria — agent/API
+  access (REST Admin + Store APIs; Hermes/n8n drive it with a
+  token), lightweight (server + worker + Postgres + Redis), and
+  easy migration later (MIT core, plain Postgres, the store is a
+  codebase). Stack = minimal Medusa v2 project at the pinned 2.22.6
+  release line, built from committed project files (no prebuilt
+  upstream image exists). Backend + admin only; the storefront
+  (Next.js starter) and a Stripe module are later builds, and
+  public exposure follows the portal rules — a separate decision.
 - **Per-service Tor onions** (Justin's request, 2026-11-09): a stack
   that needs an onion gets a Tor sidecar (same getumbrel/tor image as
   monerod) with a stack-local torrc; keys live under the stack's
