@@ -15,6 +15,10 @@ services:
       # The host path is mounted at the SAME path inside the container so
       # bind mounts inside those stacks resolve correctly.
       - PROJECTS_DIRECTORY=${STACKS_DIR}
+      # Run as the stacks folder's owner so Arcane can read the project
+      # files — its default identity (65532) cannot read a 750 home tree.
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - arcane-data:/app/data
