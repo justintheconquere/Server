@@ -14,7 +14,7 @@ services:
     environment:
       # Homepage v1+ refuses unknown Host headers. List every name/address
       # the dashboard is opened by; extend if the hostname changes.
-      HOMEPAGE_ALLOWED_HOSTS: "localhost:3005,ufo:3005,192.168.4.216:3005,100.92.183.41:3005"
+      HOMEPAGE_ALLOWED_HOSTS: "localhost:3005,ufo:3005,192.168.4.219:3005,100.92.183.41:3005"
     volumes:
       - ./config:/app/config
       - ./icons:/app/public/icons

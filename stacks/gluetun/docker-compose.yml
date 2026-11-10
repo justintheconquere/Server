@@ -58,13 +58,13 @@ services:
         <h1>Gluetun VPN</h1>
         <p>The VPN tunnel itself has no web UI. This page is a status and help placeholder.</p>
         <h2>Check your exit IP (is the tunnel up?)</h2>
-        <pre>curl -x http://192.168.4.216:8888 https://ipinfo.io/ip</pre>
+        <pre>curl -x http://192.168.4.219:8888 https://ipinfo.io/ip</pre>
         <p>Run that from any device on the LAN/Tailscale. The IP it prints is the
         VPN exit IP. If it fails or shows the home IP, the tunnel is down
         (check the vpn service logs).</p>
         <h2>Who can use the tunnel</h2>
         <p>Any app or device that supports an HTTP proxy can use
-        192.168.4.216:8888. Other stacks cannot be forced through it - they must
+        192.168.4.219:8888. Other stacks cannot be forced through it - they must
         use the proxy themselves or embed their own Gluetun sidecar.</p>
         <h2>Keys</h2>
         <p>The WireGuard private key lives only on this machine (this stack's

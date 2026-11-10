@@ -51,9 +51,9 @@ umbrelOS does not exist (by design); recovery = reinstall from the GitHub repo.
   OpenSSH server installed but key-only (or left for Tailscale SSH, Stage 3).
   No snap Docker. Disable suspend (RTX 50-series s2idle resume hangs reported
   on kernel 7.0 — irrelevant on an always-on server, just don't enable it).
-- Keep the LAN address **192.168.4.216** (router DHCP reservation or static).
+- Keep the LAN address **192.168.4.219** (router DHCP reservation or static).
 - Enable `unattended-upgrades` for security patches.
-- GATE 1: clean boot, `ip a` shows 192.168.4.216, SSH reachable on LAN.
+- GATE 1: clean boot, `ip a` shows 192.168.4.219, SSH reachable on LAN.
 
 ## Stage 2 — NVIDIA driver + Docker + container toolkit (THE gate)
 Blackwell rule (NVIDIA): the RTX 5090 **requires the open kernel modules**;

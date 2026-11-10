@@ -18,7 +18,7 @@ repo plus the secrets stored on the box itself.
 | RAM | 64 GB DDR5 |
 | Disk | 2 TB NVMe |
 | GPU | NVIDIA RTX 5090 (Blackwell, sm_120) |
-| LAN | 192.168.4.216 |
+| LAN | 192.168.4.219 |
 | Tailnet | 100.92.183.41 (fresh node from the Ubuntu install, 2026-11-09 — Tailscale gave it a new IP; the umbrelOS node was 100.122.244.66) |
 
 ## Rules of the house
@@ -90,7 +90,7 @@ fallback: 24.04 LTS with the HWE kernel).
 
 - Hostname: `ufo`
 - Install OpenSSH server during setup; do **not** install Docker as a snap.
-- Keep the LAN address **192.168.4.216** (DHCP reservation on the router or a
+- Keep the LAN address **192.168.4.219** (DHCP reservation on the router or a
   static address in the installer).
 - Do not enable suspend/sleep (RTX 50-series resume hangs are reported on
   kernel 7.0).
@@ -102,7 +102,7 @@ sudo apt install -y unattended-upgrades
 sudo dpkg-reconfigure -plow unattended-upgrades
 ```
 
-**Gate 1:** the box boots clean, answers on 192.168.4.216, and SSH on the LAN
+**Gate 1:** the box boots clean, answers on 192.168.4.219, and SSH on the LAN
 works.
 
 ## Stage 2 — NVIDIA driver and Docker
