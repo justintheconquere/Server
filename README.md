@@ -19,7 +19,7 @@ repo plus the secrets stored on the box itself.
 | Disk | 2 TB NVMe |
 | GPU | NVIDIA RTX 5090 (Blackwell, sm_120) |
 | LAN | 192.168.4.216 |
-| Tailnet | 100.122.244.66 (Tailscale IP carries over; node rejoins on rebuild) |
+| Tailnet | 100.92.183.41 (fresh node from the Ubuntu install, 2026-11-09 — Tailscale gave it a new IP; the umbrelOS node was 100.122.244.66) |
 
 ## Rules of the house
 
