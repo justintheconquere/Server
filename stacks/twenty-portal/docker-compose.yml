@@ -24,12 +24,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=Business
-      - homepage.name=Client Portal (pilot)
-      - homepage.icon=twenty.svg
-      - homepage.href=http://ufo:3002
-      - homepage.description=Twenty customer portal — pilot
 
   db:
     image: postgres:17-alpine

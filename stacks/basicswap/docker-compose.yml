@@ -27,12 +27,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=Payments
-      - homepage.name=BasicSwap
-      - homepage.icon=basicswap.svg
-      - homepage.href=http://ufo:12700
-      - homepage.description=Atomic-swap DEX (BTC↔XMR)
 
 networks:
   ufo-net:

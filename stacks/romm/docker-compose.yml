@@ -25,12 +25,6 @@ services:
       - ./data/resources:/romm/resources
       - ./data/assets:/romm/assets
       - ./data/config:/romm/config
-    labels:
-      - homepage.group=Media
-      - homepage.name=RomM
-      - homepage.icon=romm
-      - homepage.href=http://ufo:3016
-      - homepage.description=Retro game library
 
   db:
     image: mariadb:11.4

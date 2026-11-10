@@ -23,9 +23,3 @@ services:
       - seccomp=unconfined
     volumes:
       - ./config:/config
-    labels:
-      - homepage.group=Tools
-      - homepage.name=Chrome
-      - homepage.icon=chrome
-      - homepage.href=http://ufo:3004
-      - homepage.description=Browser on the box

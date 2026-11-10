@@ -23,13 +23,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - arcane-data:/app/data
       - ${STACKS_DIR}:${STACKS_DIR}
-    labels:
-      # Homepage dashboard (auto-discovery)
-      - homepage.group=Management
-      - homepage.name=Arcane
-      - homepage.icon=arcane
-      - homepage.href=http://ufo:3552
-      - homepage.description=Docker management
 
 volumes:
   arcane-data:

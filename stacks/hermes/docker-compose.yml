@@ -48,12 +48,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=AI
-      - homepage.name=Hermes
-      - homepage.icon=hermes
-      - homepage.href=http://ufo:9119
-      - homepage.description=Chief-of-staff agent (dashboard)
 
 networks:
   ufo-net:

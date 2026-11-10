@@ -30,9 +30,3 @@ services:
       # RocksDB database + media + signing keys. This IS the homeserver —
       # it is in the Backrest scope.
       - ./data:/data
-    labels:
-      - homepage.group=Comms
-      - homepage.name=Conduit (Matrix)
-      - homepage.icon=matrix
-      - homepage.href=http://ufo:6167
-      - homepage.description=Matrix homeserver

@@ -101,12 +101,6 @@ services:
         </body></html>
         EOF
         exec nginx -g 'daemon off;'
-    labels:
-      - homepage.group=Payments
-      - homepage.name=Haveno Seed Node
-      - homepage.icon=haveno.svg
-      - homepage.href=http://ufo:8014
-      - homepage.description=Own-network seed node (experimental)
 
 networks:
   ufo-net:

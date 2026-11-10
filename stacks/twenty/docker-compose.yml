@@ -35,12 +35,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=Business
-      - homepage.name=Twenty CRM
-      - homepage.icon=twenty.svg
-      - homepage.href=http://ufo:3000
-      - homepage.description=AssureBay CRM
 
   worker:
     image: twentycrm/twenty:v2.56.1

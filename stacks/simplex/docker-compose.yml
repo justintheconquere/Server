@@ -105,9 +105,3 @@ services:
         </body></html>
         HTML
         exec nginx -g 'daemon off;'
-    labels:
-      - homepage.group=Comms
-      - homepage.name=SimpleX Server
-      - homepage.icon=simplex-chat
-      - homepage.href=http://ufo:5225
-      - homepage.description=Private SMP + XFTP relays

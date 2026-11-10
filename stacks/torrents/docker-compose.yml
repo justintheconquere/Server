@@ -36,12 +36,6 @@ services:
     volumes:
       - ./data/qbit/config:/config
       - ./data/downloads:/downloads
-    labels:
-      - homepage.group=Tools
-      - homepage.name=qBittorrent
-      - homepage.icon=qbittorrent
-      - homepage.href=http://ufo:8080
-      - homepage.description=Torrent downloader (via VPN)
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:version-2.7.0.5723
@@ -55,9 +49,3 @@ services:
       - "9696:9696"
     volumes:
       - ./data/prowlarr/config:/config
-    labels:
-      - homepage.group=Tools
-      - homepage.name=Prowlarr
-      - homepage.icon=prowlarr
-      - homepage.href=http://ufo:9696
-      - homepage.description=Torrent indexer search

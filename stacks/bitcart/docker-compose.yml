@@ -38,12 +38,6 @@ services:
         exec caddy run --config /data/Caddyfile --adapter caddyfile
     volumes:
       - ./data/caddy:/data
-    labels:
-      - homepage.group=Payments
-      - homepage.name=Bitcart (test)
-      - homepage.icon=bitcart.svg
-      - homepage.href=http://ufo:3003
-      - homepage.description=XMR store — side-by-side test
 
   api:
     image: bitcart/bitcart:stable

@@ -38,12 +38,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=AI
-      - homepage.name=Paperclip
-      - homepage.icon=paperclip.svg
-      - homepage.href=http://ufo:3100
-      - homepage.description=Agent org chart, budgets, approvals
 
 networks:
   ufo-net:

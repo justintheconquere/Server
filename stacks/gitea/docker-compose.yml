@@ -29,9 +29,3 @@ services:
       - "2222:22"
     volumes:
       - ./data:/data
-    labels:
-      - homepage.group=Management
-      - homepage.name=Gitea
-      - homepage.icon=gitea
-      - homepage.href=http://ufo:3007
-      - homepage.description=Self-hosted Git — local repo home

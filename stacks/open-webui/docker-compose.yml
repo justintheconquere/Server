@@ -23,9 +23,3 @@ services:
       - "3008:8080"
     volumes:
       - ./data:/app/backend/data
-    labels:
-      - homepage.group=AI
-      - homepage.name=Open WebUI
-      - homepage.icon=open-webui
-      - homepage.href=http://ufo:3008
-      - homepage.description=Chat UI for local models

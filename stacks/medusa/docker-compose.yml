@@ -31,12 +31,6 @@ services:
     depends_on:
       - db
       - redis
-    labels:
-      - homepage.group=Business
-      - homepage.name=Medusa
-      - homepage.icon=medusa
-      - homepage.href=http://ufo:9000/app
-      - homepage.description=Self-hosted store — backend + admin
 
   worker:
     image: ufo/medusa:2.22.6

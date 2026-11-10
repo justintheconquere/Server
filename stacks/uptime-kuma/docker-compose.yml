@@ -14,9 +14,3 @@ services:
       - "3009:3001"
     volumes:
       - ./data:/app/data
-    labels:
-      - homepage.group=Management
-      - homepage.name=Uptime Kuma
-      - homepage.icon=uptime-kuma
-      - homepage.href=http://ufo:3009
-      - homepage.description=Uptime monitoring + alerts

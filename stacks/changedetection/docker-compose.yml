@@ -21,12 +21,6 @@ services:
       - "3014:5000"
     volumes:
       - ./data:/datastore
-    labels:
-      - homepage.group=Tools
-      - homepage.name=ChangeDetection
-      - homepage.icon=changedetection
-      - homepage.href=http://ufo:3014
-      - homepage.description=Web page change alerts
 
   browser:
     image: dgtlmoon/sockpuppetbrowser:0.0.3

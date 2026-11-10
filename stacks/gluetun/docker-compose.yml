@@ -33,12 +33,6 @@ services:
       # Control server stays internal to this stack (not published).
       CONTROL_SERVER_LISTENING_ADDRESS: ":8000"
       TZ: America/New_York
-    labels:
-      - homepage.group=Infrastructure
-      - homepage.name=Gluetun
-      - homepage.icon=gluetun
-      - homepage.href=http://ufo:8010
-      - homepage.description=VPN + proxy :8888
 
   # Tiny status page: how to check the tunnel is up (exit IP test).
   web:

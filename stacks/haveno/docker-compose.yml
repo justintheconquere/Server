@@ -83,12 +83,6 @@ services:
         </body></html>
         EOF
         exec nginx -g 'daemon off;'
-    labels:
-      - homepage.group=Payments
-      - homepage.name=Haveno
-      - homepage.icon=haveno.svg
-      - homepage.href=http://ufo:8013
-      - homepage.description=DEX daemon (experimental)
 
 networks:
   ufo-net:

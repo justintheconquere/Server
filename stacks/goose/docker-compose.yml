@@ -59,9 +59,3 @@ services:
         </body></html>
         HTML
         exec nginx -g 'daemon off;'
-    labels:
-      - homepage.group=AI
-      - homepage.name=Goose
-      - homepage.icon=goose.svg
-      - homepage.href=http://ufo:8012
-      - homepage.description=Headless agent (experimental)

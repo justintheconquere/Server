@@ -26,12 +26,6 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./proxy.conf:/etc/nginx/proxy.conf:ro
-    labels:
-      - homepage.group=AI
-      - homepage.name=Dify
-      - homepage.icon=dify.svg
-      - homepage.href=http://ufo:3017
-      - homepage.description=LLM app platform (pilot)
 
   api:
     image: langgenius/dify-api:1.19.0

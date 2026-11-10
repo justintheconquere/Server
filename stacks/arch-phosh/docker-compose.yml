@@ -59,9 +59,3 @@ services:
       VNC_SERVER: desktop:5900
     depends_on:
       - desktop
-    labels:
-      - homepage.group=Tools
-      - homepage.name=Arch + Phosh
-      - homepage.icon=arch-phosh.svg
-      - homepage.href=http://ufo:8015
-      - homepage.description=Phone desktop in the browser

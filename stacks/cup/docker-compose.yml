@@ -17,9 +17,3 @@ services:
       - "3015:8000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    labels:
-      - homepage.group=Management
-      - homepage.name=Cup
-      - homepage.icon=cup
-      - homepage.href=http://ufo:3015
-      - homepage.description=Docker image update watcher

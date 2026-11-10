@@ -44,12 +44,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=Business
-      - homepage.name=n8n
-      - homepage.icon=n8n
-      - homepage.href=http://ufo:5678
-      - homepage.description=Workflow automation — ops engine
 
   db:
     image: postgres:16-alpine

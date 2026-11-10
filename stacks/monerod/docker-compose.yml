@@ -47,11 +47,6 @@ services:
       # Shared network: BTCPay, Bitcart and Haveno reach the daemon as
       # http://monerod:18081 (with the RPC login from their own .env files).
       ufo-net:
-    labels:
-      - homepage.group=Infrastructure
-      - homepage.name=Monero Node
-      - homepage.icon=monero
-      - homepage.description=monerod (RPC on 18081)
 
   # Monero GUI wallet — official release in a Webtop browser desktop
   # (built from ./wallet, see its Dockerfile). TAILSCALE-ONLY, same class
@@ -85,12 +80,6 @@ services:
       - seccomp:unconfined
     depends_on:
       - monerod
-    labels:
-      - homepage.group=Payments
-      - homepage.name=Monero GUI Wallet
-      - homepage.icon=monero
-      - homepage.href=http://ufo:3006
-      - homepage.description=Official GUI wallet (tailnet only)
 
   # Tor sidecar — carries the RPC hidden service. If the pre-wipe key folders
   # were saved (see README Stage 0), drop them into ./tor-data/ before first

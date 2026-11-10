@@ -16,9 +16,3 @@ services:
       - "3011:8080"
     volumes:
       - ./data:/etc/searxng
-    labels:
-      - homepage.group=Tools
-      - homepage.name=SearXNG
-      - homepage.icon=searxng
-      - homepage.href=http://ufo:3011
-      - homepage.description=Private metasearch (agent backend too)

@@ -41,9 +41,3 @@ services:
       - --
       - /bin/bash
       - -l
-    labels:
-      - homepage.group=Management
-      - homepage.name=Web Terminal
-      - homepage.icon=ttyd.svg
-      - homepage.href=http://ufo:7681
-      - homepage.description=Host terminal — root shell, tailnet only

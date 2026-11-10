@@ -19,9 +19,3 @@ services:
       - "3010:80"
     volumes:
       - ./data:/data
-    labels:
-      - homepage.group=Tools
-      - homepage.name=Vaultwarden
-      - homepage.icon=vaultwarden
-      - homepage.href=http://ufo:3010
-      - homepage.description=Password vault (Bitwarden-compatible)

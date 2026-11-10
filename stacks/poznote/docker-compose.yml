@@ -31,12 +31,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-    labels:
-      - homepage.group=Business
-      - homepage.name=Poznote
-      - homepage.icon=poznote.svg
-      - homepage.href=http://ufo:8040
-      - homepage.description=Plans and notes
 
   mcp-server:
     image: ghcr.io/timothepoznanski/poznote-mcp:6

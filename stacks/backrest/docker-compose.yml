@@ -29,9 +29,3 @@ services:
       # Backup SOURCES: the whole stacks tree (compose files, .env files,
       # and every stack's data dir), read-only.
       - ${STACKS_DIR}:/backup-sources/stacks:ro
-    labels:
-      - homepage.group=Management
-      - homepage.name=Backrest
-      - homepage.icon=backrest
-      - homepage.href=http://ufo:9898
-      - homepage.description=Backups (restic → USB)

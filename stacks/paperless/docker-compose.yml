@@ -31,12 +31,6 @@ services:
       - ./data/media:/usr/src/paperless/media
       - ./data/export:/usr/src/paperless/export
       - ./data/consume:/usr/src/paperless/consume
-    labels:
-      - homepage.group=Business
-      - homepage.name=Paperless
-      - homepage.icon=paperless-ngx
-      - homepage.href=http://ufo:3012
-      - homepage.description=Document archive (OCR + search)
 
   db:
     image: postgres:16-alpine

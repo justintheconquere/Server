@@ -17,9 +17,3 @@ services:
       - ./data:/data
       - ./strfry.conf:/etc/strfry.conf:ro
     command: ["strfry", "--config=/etc/strfry.conf", "relay"]
-    labels:
-      - homepage.group=Comms
-      - homepage.name=strfry (Nostr)
-      - homepage.icon=strfry.svg
-      - homepage.href=http://ufo:7777
-      - homepage.description=Voodoo Bazaar relay

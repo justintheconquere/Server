@@ -13,9 +13,3 @@ services:
       - ./data/config:/config
       - ./data/cache:/cache
       - ./data/media:/media
-    labels:
-      - homepage.group=Media
-      - homepage.name=Jellyfin
-      - homepage.icon=jellyfin
-      - homepage.href=http://ufo:8096
-      - homepage.description=Media server

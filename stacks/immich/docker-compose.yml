@@ -28,12 +28,6 @@ services:
       - "2283:2283"
     volumes:
       - ./data/library:/data
-    labels:
-      - homepage.group=Media
-      - homepage.name=Immich
-      - homepage.icon=immich
-      - homepage.href=http://ufo:2283
-      - homepage.description=Photo backup + library
 
   ml:
     image: ghcr.io/immich-app/immich-machine-learning:v3.3.6

@@ -43,12 +43,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=AI
-      - homepage.name=LocalAI
-      - homepage.icon=localai
-      - homepage.href=http://ufo:3018
-      - homepage.description=Inference server — scaling experiments
 
 networks:
   ufo-net:

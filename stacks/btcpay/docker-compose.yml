@@ -35,12 +35,6 @@ services:
     networks:
       - default
       - ufo-net
-    labels:
-      - homepage.group=Payments
-      - homepage.name=BTCPay (Monero)
-      - homepage.icon=btcpay-server
-      - homepage.href=https://pay.voodoobazaar.com
-      - homepage.description=Voodoo Bazaar payments
 
   db:
     image: postgres:16-alpine
