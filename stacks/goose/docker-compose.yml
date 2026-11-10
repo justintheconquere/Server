@@ -19,6 +19,9 @@ services:
       # Local endpoints ignore the key, but Goose requires one to exist.
       OPENAI_API_KEY: "local"
       GOOSE_MODEL: gpt-oss:20b
+      # goose serve refuses to start unauthenticated. The port is never
+      # published (internal only); the key lives in the stack .env.
+      GOOSE_SERVER__SECRET_KEY: ${GOOSE_SERVER__SECRET_KEY:?set GOOSE_SERVER__SECRET_KEY in .env}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

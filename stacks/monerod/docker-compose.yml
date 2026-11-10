@@ -26,19 +26,27 @@ services:
       - --p2p-bind-port=18080
       - --public-node
       - --confirm-external-bind
-      - --prune-blockchain=${PRUNE_BLOCKCHAIN:-1}
+      # Pruned node (~105 GiB). For a full node (~265 GiB), remove this
+      # flag and delete ./data before starting.
+      - --prune-blockchain
       - --out-peers=12
       - --in-peers=12
       - --limit-rate-up=1048576
       - --limit-rate-down=1048576
       # Relay transactions through the tor sidecar (clearnet identity stays
       # off the tx path, same as the Umbrel setup). Remove if tor is removed.
-      - --tx-proxy=tor,tor:9050
+      # tor zone + disable_noise is the working form: the tor container's
+      # pinned IP (Tor 0.4.9/monero 0.18 reject the other combinations at
+      # p2p init — verified live 2026-11-09).
+      - --tx-proxy=tor,10.99.99.3:9050,disable_noise
     networks:
-      - default
+      default:
+        # Static IP: Tor's HiddenServicePort target must be an IP, not a
+        # hostname (Tor 0.4.9 rejects hostname targets at config time).
+        ipv4_address: 10.99.99.2
       # Shared network: BTCPay, Bitcart and Haveno reach the daemon as
       # http://monerod:18081 (with the RPC login from their own .env files).
-      - ufo-net
+      ufo-net:
     labels:
       - homepage.group=Infrastructure
       - homepage.name=Monero Node
@@ -100,9 +108,17 @@ services:
     volumes:
       - ./torrc:/etc/tor/torrc:ro
       - ./tor-data:/data
+    networks:
+      default:
+        # Pinned: monerod's --tx-proxy points at this IP.
+        ipv4_address: 10.99.99.3
     depends_on:
       - monerod
 
 networks:
+  default:
+    ipam:
+      config:
+        - subnet: 10.99.99.0/24
   ufo-net:
     external: true
